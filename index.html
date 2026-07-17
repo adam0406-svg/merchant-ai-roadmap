@@ -56,38 +56,13 @@
       <h1 class="rv" style="--d:.1s">From merchant problem to working AI: <span class="q">how I would tackle it</span></h1>
       <p class="sub rv" style="--d:.2s"><b>An AI that resolves merchant problems, not just hands them off.</b> This is how I would build it, with one running example from Flatpay's world: <b>"My terminal won't take payments."</b> Scroll through the journey, open any phase for the detail. Built without inside knowledge: every assumption is cheap to correct.</p>
       <div class="hero-actions rv" style="--d:.3s">
-        <a class="btn solid" href="#simulator">Run the decision model</a>
-        <a class="btn ghost" href="workflow.html">Read the full specification</a>
+        <a class="btn solid" href="#overview">Start the journey</a>
         <a class="hero-note" href="Flatpay-How-I-Would-Tackle-It-Adam-Barfod.pdf" download>PDF version, 7 pages</a>
       </div>
     </div>
     <div class="scroll-cue" aria-hidden="true">
       <span>Scroll</span>
       <span class="line"></span>
-    </div>
-  </section>
-
-  <!-- ============ PROOF STRIP ============ -->
-  <section class="proof-sec" id="proof">
-    <div class="container">
-      <div class="proof rv">
-        <div class="pf">
-          <span class="pf-l">Built</span>
-          <span class="pf-c">Six-phase case study, full workflow specification, and the executable decision model below</span>
-        </div>
-        <div class="pf">
-          <span class="pf-l">Implementation</span>
-          <span class="pf-c">Semantic HTML, CSS and vanilla JavaScript, built with Claude Code; designed and implemented by Adam Grøfte Barfod</span>
-        </div>
-        <div class="pf">
-          <span class="pf-l">Status</span>
-          <span class="pf-c">Independent concept on illustrative data; not connected to Flatpay systems; assumptions marked throughout</span>
-        </div>
-        <div class="pf">
-          <span class="pf-l">Related work</span>
-          <span class="pf-c">AI KYB prototype from my first Flatpay application · custom AI agents designed and implemented for clients at Aety</span>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -156,22 +131,6 @@
           </span>
           <svg aria-hidden="true" focusable="false" width="110" height="110" viewBox="0 0 24 24" fill="none" stroke="#9fe870" stroke-width="1.3" stroke-linecap="round"><rect x="6" y="3" width="12" height="18" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="10.5" x2="15" y2="10.5"/><line x1="12" y1="17.5" x2="12" y2="17.5" stroke-width="2.2"/></svg>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ DECISION MODEL SIMULATOR ============ -->
-  <section class="sec" id="simulator">
-    <div class="container">
-      <p class="sec-label rv">Run the decision model</p>
-      <div class="sim-paper rv" style="--d:.1s">
-        <p class="sim-honesty">This is an executable implementation of the proposed decision model. The rules run as shown; the scenarios, system signals and branch logic remain hypotheses until validated against Flatpay's data and operating procedures. The conversational AI layer is out of scope: this demonstrates the workflow, not the voice agent.</p>
-        <p class="sim-refs">The model encodes the specification's control flow and follows its disclosure and compliance constraints; the standards and practice it leans on are <a href="workflow.html#s11">referenced in the specification</a>.</p>
-        <div class="sim-nojs card">
-          <div class="ct">The interactive decision model needs JavaScript</div>
-          <div class="cc">With scripts off you still have the full logic in writing: the decision table, branch playbooks and gates are specified in <a href="workflow.html">the workflow specification</a>.</div>
-        </div>
-        <div id="sim-app"></div>
       </div>
     </div>
   </section>
@@ -890,6 +849,23 @@
     </section>
 
   </div>
+
+  <!-- ============ DECISION MODEL SIMULATOR ============ -->
+  <section class="sec" id="simulator">
+    <div class="container">
+      <p class="sec-label rv">Run the decision model</p>
+      <p class="sim-intro rv" style="--d:.05s">The deterministic core of the phase 3 design, running live: pick a scripted scenario or set the signals yourself and follow the rules to a branch.</p>
+      <div class="sim-paper rv" style="--d:.1s">
+        <p class="sim-honesty">This is an executable implementation of the proposed decision model. The rules run as shown; the scenarios, system signals and branch logic remain hypotheses until validated against Flatpay's data and operating procedures. The conversational AI layer is out of scope: this demonstrates the workflow, not the voice agent.</p>
+        <p class="sim-refs">The model encodes the specification's control flow and follows its disclosure and compliance constraints; the standards and practice it leans on are <a href="workflow.html#s11">referenced in the specification</a>.</p>
+        <div class="sim-nojs card">
+          <div class="ct">The interactive decision model needs JavaScript</div>
+          <div class="cc">With scripts off you still have the full logic in writing: the decision table, branch playbooks and gates are specified in <a href="workflow.html">the workflow specification</a>.</div>
+        </div>
+        <div id="sim-app"></div>
+      </div>
+    </div>
+  </section>
 
   <!-- ============ THREE BELIEFS ============ -->
   <section class="sec">

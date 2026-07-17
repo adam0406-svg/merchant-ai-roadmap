@@ -600,24 +600,6 @@ html.embed .wf-hero { min-height: auto; padding-top: 46px; }
 @media (prefers-reduced-motion: reduce) { .scroll-cue .line::after { animation: none; } }
 @media (max-height: 760px) { .scroll-cue { display: none; } }
 
-/* ==================== Proof strip ==================== */
-.proof-sec { position: relative; z-index: 2; padding: 0 0 clamp(44px, 7vh, 80px); }
-.proof {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(18px, 3vw, 36px);
-  border-top: 1px solid rgba(159, 232, 112, 0.14);
-  border-bottom: 1px solid rgba(159, 232, 112, 0.14);
-  padding: 22px 0 24px;
-}
-.pf-l {
-  display: block; font-family: var(--mono); font-size: 0.64rem; font-weight: 700;
-  letter-spacing: 0.22em; text-transform: uppercase; color: var(--lime); margin-bottom: 8px;
-}
-.pf-c { color: var(--mist-dim); font-size: 0.8rem; line-height: 1.6; }
-.pf-c a { color: var(--mist); }
-.pf-c a:hover { color: var(--lime); }
-@media (max-width: 900px) { .proof { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 680px) { .proof { grid-template-columns: 1fr; gap: 16px; } }
-
 /* ==================== Journey at a glance ==================== */
 .overview { padding-top: 0; }
 .ov-track { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
@@ -783,6 +765,13 @@ html:not(.js) .mring { opacity: 0.4; }
   animation: ffrise linear infinite;
   opacity: 0;
 }
+.ff.glyph {
+  background: none; border-radius: 0; filter: none;
+  width: auto !important; height: auto !important;
+  font-family: var(--mono); font-weight: 700; color: var(--lime);
+  text-shadow: 0 0 8px rgba(159, 232, 112, 0.45);
+  line-height: 1; user-select: none;
+}
 @keyframes ffrise {
   0% { transform: translate(0, 0); opacity: 0; }
   8% { opacity: var(--o, 0.4); }
@@ -886,6 +875,7 @@ html:not(.js) .maxis { stroke-dashoffset: 0; }
 @keyframes arrowpulse { 0%, 100% { opacity: 0.4; transform: translateY(0); } 50% { opacity: 1; transform: translateY(3px); } }
 
 /* ==================== Decision model simulator ==================== */
+.sim-intro { color: var(--mist-dim); font-size: 0.95rem; max-width: 620px; margin: -18px 0 26px; line-height: 1.65; }
 .sim-paper {
   background: var(--paper); color: var(--ink); border-radius: 26px;
   padding: clamp(24px, 4.5vw, 54px);
@@ -959,6 +949,7 @@ html.sim-js .sim-nojs { display: none; }
 .sim-test-mark { font-family: var(--mono); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; }
 .sim-test-row.pass .sim-test-mark { color: var(--tag-auto); }
 .sim-test-row.fail .sim-test-mark { color: var(--tag-never); }
+.sim-test-cmp { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); }
 .sim-test-detail { width: 100%; font-family: var(--mono); font-size: 0.72rem; color: var(--tag-never); padding-left: 12px; }
 .sim-test-sum { font-weight: 700; margin: 12px 0 0; font-size: 0.88rem; }
 .sim-test-sum.pass { color: var(--tag-auto); }

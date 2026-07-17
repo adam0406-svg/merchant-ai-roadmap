@@ -36,17 +36,28 @@
     });
   }
 
-  /* ---------- fireflies ---------- */
+  /* ---------- drifting transaction particles ---------- */
+  /* Currency and payment glyphs from Flatpay's six markets (kr, EUR, GBP)
+     rising like settled transactions; a few plain sparks in between. */
   var ambient = document.querySelector('.ambient');
   if (ambient && !reduced) {
-    for (var i = 0; i < 12; i++) {
+    var glyphs = ['kr', '€', '£', '€', 'kr', '✓', '€'];
+    for (var i = 0; i < 14; i++) {
       var ff = document.createElement('span');
-      ff.className = 'ff';
-      var size = 2.5 + Math.random() * 3.5;
-      ff.style.width = size + 'px';
-      ff.style.height = size + 'px';
+      var isGlyph = i % 3 !== 2; /* two glyphs for every plain spark */
+      if (isGlyph) {
+        ff.className = 'ff glyph';
+        ff.textContent = glyphs[i % glyphs.length];
+        ff.style.fontSize = (8 + Math.random() * 5).toFixed(1) + 'px';
+      } else {
+        ff.className = 'ff';
+        var size = 2.5 + Math.random() * 3.5;
+        ff.style.width = size + 'px';
+        ff.style.height = size + 'px';
+      }
+      ff.setAttribute('aria-hidden', 'true');
       ff.style.left = (Math.random() * 100) + '%';
-      ff.style.setProperty('--o', (0.15 + Math.random() * 0.35).toFixed(2));
+      ff.style.setProperty('--o', (0.12 + Math.random() * 0.3).toFixed(2));
       ff.style.setProperty('--sway', ((Math.random() - 0.5) * 120).toFixed(0) + 'px');
       var dur = 16 + Math.random() * 18;
       ff.style.animationDuration = dur.toFixed(1) + 's';

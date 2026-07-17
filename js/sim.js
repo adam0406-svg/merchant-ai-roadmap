@@ -555,6 +555,8 @@
   testBtn.type = 'button';
   var testNote = el('p', 'sim-tests-note',
     'Logic tests of the decision table against the scripted scenarios above: the stress-testing discipline from phase 4 applied to this model.');
+  var testHow = el('p', 'sim-tests-note',
+    'How it works: each of the ' + PRESETS.length + ' scenarios stores its expected result (branch, mode, escalation trigger and the full structured output). This button feeds every scenario through the decision rules again, live in your browser, and compares what the engine returns with what is stored. A match is PASS; any drift, for example after a rule change, shows as FAIL with the exact difference.');
   var testResults = el('div', 'sim-test-results');
   testResults.setAttribute('aria-live', 'polite');
   testBtn.addEventListener('click', function () {
@@ -562,9 +564,13 @@
     var allPass = true;
     PRESETS.forEach(function (p) {
       var problems = checkPreset(p);
+      var actual = decide(p.input);
+      var spec = p.expectedSummary;
       var row = el('div', 'sim-test-row ' + (problems.length ? 'fail' : 'pass'));
       row.appendChild(el('span', 'sim-test-mark', problems.length ? 'FAIL' : 'PASS'));
       row.appendChild(el('span', 'sim-test-name', p.name));
+      row.appendChild(el('span', 'sim-test-cmp',
+        'expected ' + spec.mode + ' / ' + spec.primaryBranch + ' · engine returned ' + actual.mode + ' / ' + actual.primaryBranch));
       if (problems.length) {
         allPass = false;
         var d = el('div', 'sim-test-detail');
@@ -577,6 +583,7 @@
       allPass ? 'All ' + PRESETS.length + ' scenarios produce their expected structured output.' : 'At least one scenario deviates from its stored expected output.'));
   });
   testPanel.appendChild(testNote);
+  testPanel.appendChild(testHow);
   testPanel.appendChild(testBtn);
   testPanel.appendChild(testResults);
 
