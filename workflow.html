@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Full workflow specification · Designing for resolution, not deflection</title>
+<meta name="description" content="An agentic workflow design for a merchant-facing Voice AI, worked end to end: signal map, six branches, permissions, 20 edge cases, handoff spec, localization, test plan, metrics, assumptions register.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230b3b2e'/%3E%3Ccircle cx='12' cy='12' r='5' fill='%239fe870'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body class="wf">
+
+<div class="ambient" aria-hidden="true">
+  <div class="blob a"></div>
+  <div class="blob b"></div>
+</div>
+
+<div class="progress" aria-hidden="true"></div>
+
+<header class="topbar">
+  <a class="brand" href="index.html">Adam Grøfte Barfod<span> · method journey</span></a>
+  <div class="tb-right">
+    <a class="tb-contact" href="index.html#phase-3">&#8592; Back to the roadmap</a>
+    <a class="tb-pdf" href="Flatpay-Agentic-Workflow-Design-Adam-Barfod.pdf" download>Spec PDF &#8595;</a>
+  </div>
+</header>
+
+<section class="wf-hero">
+  <div class="container">
+    <p class="kicker rv">Phase 03 · Design · the full specification</p>
+    <h1 class="rv" style="--d:.08s">Designing for resolution, not deflection</h1>
+    <p class="subtitle rv" style="--d:.16s">An agentic workflow design, worked end to end: <span class="quote">"My terminal won't take payments"</span></p>
+    <p class="meta rv" style="--d:.22s">Worked example for Flatpay's merchant-facing Voice AI · Prepared by Adam Grøfte Barfod · July 2026</p>
+    <div class="hero-actions rv" style="--d:.28s">
+      <a class="btn solid" href="Flatpay-Agentic-Workflow-Design-Adam-Barfod.pdf" download>
+        Download this spec as PDF
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M4 19h16"/></svg>
+      </a>
+      <span class="hero-note">12 pages · the same content as this page</span>
+    </div>
+  </div>
+</section>
+
+<div class="wf-body">
+<main class="container">
+
+  <div class="why-box">
+    <span class="lbl">Purpose and scope</span>
+    <p>This document specifies an agentic workflow for a merchant-facing Voice AI handling one high-stakes call type, <span class="quote">"My terminal won't take payments"</span>, end to end: problem framing, signal composition, flow design, permissions, edge cases, escalation, localization, stress-testing, and post-launch measurement. Scope covers one call type across six markets (DK, FI, FR, DE, IT, UK). Status: a design prepared for validation, without inside knowledge of Flatpay's systems; every dependency on internals is written as a working assumption and consolidated with its fastest validation path in the assumptions section. Intended readers: support leadership and the AI team.</p>
+  </div>
+
+  <h3>The specification at a glance · sections 1 to 9</h3>
+  <div class="pipeline">
+    <span><b>1</b>Frame</span>
+    <span><b>2</b>Signals</span>
+    <span><b>3</b>Flow</span>
+    <span><b>4</b>Permissions</span>
+    <span><b>5</b>Edge cases</span>
+    <span><b>6</b>Handoff</span>
+    <span><b>7</b>Localization</span>
+    <span><b>8</b>Testing</span>
+    <span><b>9</b>Metrics</span>
+  </div>
+  <div class="stats-paper">
+    <div class="stat"><div class="n">6</div><div class="c">diagnosis branches</div></div>
+    <div class="stat"><div class="n">20</div><div class="c">edge cases designed for</div></div>
+    <div class="stat"><div class="n">6</div><div class="c">test layers before go-live</div></div>
+    <div class="stat"><div class="n">1</div><div class="c">ground-truth success metric</div></div>
+  </div>
+
+  <h2 id="s1"><span class="secnum">1</span>Problem framing</h2>
+  <p class="lead">A merchant calls: <span class="quote">"My terminal won't take payments."</span> There is a queue of customers behind them. Every minute unresolved is lost revenue and visible embarrassment in front of their customers. This is the call where support quality is judged.</p>
+  <p>The sentence sounds like one problem. It is at least six, spread across different systems, and only some of them are about the terminal:</p>
+  <div class="table-scroll">
+    <table>
+      <tr><th style="width:34%">What the merchant says</th><th style="width:30%">What may actually be wrong</th><th>Where the truth lives</th></tr>
+      <tr><td>"It won't take payments" / "It's dead" / "Nothing happens"</td><td>Local connectivity is down (Wi-Fi, SIM, router)</td><td>Terminal telemetry, network heartbeat</td></tr>
+      <tr><td>"It keeps saying error" / "It rejects the card"</td><td>Card-side declines (issuer, not merchant)</td><td>Transaction log, decline codes</td></tr>
+      <tr><td>"It froze" / "The screen is stuck"</td><td>Device fault or pending software update</td><td>Device status, firmware version</td></tr>
+      <tr><td>"Payments stopped working today"</td><td>Account-level hold (risk, KYC, settlement)</td><td>Account status systems</td></tr>
+      <tr><td>"Everyone here has this problem"</td><td>Platform or processor incident</td><td>Incident status, call-volume spike</td></tr>
+      <tr><td>"The system isn't working"</td><td>Different device entirely (POS tablet, printer), or user error</td><td>Product registry + guided questions</td></tr>
+    </table>
+  </div>
+  <p>This is why the workflow cannot be built from FAQ content. Merchants describe symptoms, in their own words, under stress. Root causes live in systems. <b>The design job is orchestration: composing what the merchant says with what the systems show, and routing to the fix.</b></p>
+  <p><b>Why this workflow first:</b> highest urgency of any call type (revenue stops), high expected volume, to be confirmed against ticket data, and unusually high resolution potential, because most root causes are checkable and fixable through signals the AI can reach.</p>
+
+  <h2 id="s2"><span class="secnum">2</span>Signal map: check before you ask</h2>
+  <p>A great support agent doesn't ask "is it plugged in?" when the dashboard shows the terminal heartbeating. The AI should reach for signals first and use questions to disambiguate, not to gather what systems already know.</p>
+  <div class="table-scroll">
+    <table>
+      <tr><th style="width:20%">Source</th><th style="width:42%">Signals</th><th>What it distinguishes</th></tr>
+      <tr><td>Terminal telemetry, where terminals report status to a central system</td><td>Online/offline, last heartbeat, battery, firmware version, error state</td><td>Connectivity vs. device fault vs. "actually fine"</td></tr>
+      <tr><td>Transaction log</td><td>Recent attempts, outcomes, decline codes, last successful payment</td><td>"No attempts arriving" vs. "attempts arriving and declined"</td></tr>
+      <tr><td>Account status</td><td>Settlement state, KYC/risk holds, payout blocks</td><td>Hardware problem vs. account problem</td></tr>
+      <tr><td>Incident status</td><td>Open platform/processor incidents, real-time call-volume spike on this symptom</td><td>One merchant's problem vs. everyone's problem</td></tr>
+      <tr><td>Merchant profile</td><td>Market, language, product suite (terminal-only vs. POS bundle), hardware model, opening hours</td><td>Which script, which market overlay, which device</td></tr>
+      <tr><td>Support history</td><td>Recent tickets and calls, what was already tried, open cases</td><td>First contact vs. repeat contact (different path entirely)</td></tr>
+    </table>
+  </div>
+  <div class="why-box">
+    <span class="lbl">Design rule · the repeat-caller gate</span>
+    <p>Support history is checked <i>before</i> diagnosis. A merchant calling the second time about the same issue must never be walked through the same script again. Repeat contact on the same symptom within 7 days routes to a human with full history attached, unless the previous contact ended in a verified resolution, which makes this a new fault. Nothing erodes trust in an AI faster than making a frustrated caller repeat a failed procedure.</p>
+  </div>
+
+  <h2 id="s3"><span class="secnum">3</span>The workflow</h2>
+  <p>The control flow is deterministic: predefined stages and branch logic, with the language model doing judgment work <i>inside</i> stages (symptom classification, natural conversation, summarization). This follows the reliability principle that production agentic systems should be workflows first, agents only where the task genuinely requires open-ended behavior.</p>
+
+  <div class="flow">
+    <div class="stage"><b>0 · Answer &amp; stabilize</b><span>Acknowledge urgency in the merchant's language: "Let's get you taking payments again." Set expectations for the next two minutes. No account data and no payment fallbacks yet: those wait for verification, because offering payment alternatives to an unverified caller is a card-not-present fraud channel.</span></div>
+    <div class="arrow">&#9660;</div>
+    <div class="stage"><b>1 · Identify &amp; verify</b><span>Identify via caller ID, org number, or terminal ID; authenticate with a real second factor (one-time code or callback to the number on file) since all three identifiers are public or spoofable. Tiered assurance: hardware troubleshooting at low assurance, account data and payment fallbacks (a payment link, where the market supports one) only after authentication. Then: the repeat-caller gate.</span></div>
+    <div class="arrow">&#9660;</div>
+    <div class="stage"><b>2 · Compose signals</b><span>Fetch telemetry, transaction log, account status, incident status in parallel <i>while</i> asking one high-yield question: "What does the screen show when you try?" Signals + answer feed classification.</span></div>
+    <div class="arrow">&#9660;</div>
+    <div class="stage hl"><b>3 · Route to a diagnosis branch</b><span>LLM classifies the symptom; deterministic rules pick the branch. If confidence is low: one clarifying question, max two loops, then human.</span></div>
+    <div class="arrow">&#9660;</div>
+    <div class="branches">
+      <div class="branch"><span class="bl">A</span><b class="t">Platform incident</b><br>Tell the merchant it is not their fault, give status and expected resolution, log for callback. Suppress troubleshooting.</div>
+      <div class="branch"><span class="bl">B</span><b class="t">Local connectivity</b><br>Guided recovery: network check, reboot, SIM or Wi-Fi failover where the hardware supports it. Verify each step against telemetry, not just "did that work?"</div>
+      <div class="branch"><span class="bl">C</span><b class="t">Device fault / software</b><br>Remote checks, push update if safe (confirm first). If hardware is dead: replacement flow with clear timeline.</div>
+      <div class="branch"><span class="bl">D</span><b class="t">Account-level hold</b><br>Never speculate about reasons on the call. Acknowledge, state that a specialist must handle it, warm-transfer with priority.</div>
+      <div class="branch"><span class="bl">E</span><b class="t">Card-side declines</b><br>Show the terminal works: point to decline codes, explain issuer declines, reassure. Evidence, not apology.</div>
+      <div class="branch"><span class="bl">F</span><b class="t">Ambiguous / other device</b><br>Disambiguate device (terminal vs. POS tablet vs. printer). One more signal or question; if still unclear, human.</div>
+    </div>
+    <div class="arrow">&#9660;</div>
+    <div class="stage"><b>4 · Act &amp; verify with ground truth</b><span>After any fix: confirm with ground truth. A terminal-to-host connection test, a payment attempt run by the merchant, or telemetry showing the next live transaction go through. "It should work now" is not a resolution; a working terminal, observed, is.</span></div>
+    <div class="arrow">&#9660;</div>
+    <div class="stage"><b>5 · Close, or hand off warm</b><span>Close: verified success, summary spoken and logged, ticket written. Hand off: warm transfer with the full context package (see Escalation and handoff) so the merchant never repeats themselves.</span></div>
+  </div>
+
+  <h2 id="s4"><span class="secnum">4</span>What the AI may do: permissions</h2>
+  <div class="table-scroll">
+    <table>
+      <tr><th style="width:16%">Level</th><th>Actions</th></tr>
+      <tr><td><span class="tag auto">Autonomous</span></td><td>Read any signal; guide reboot and network recovery; explain decline codes; resend receipts; create and update tickets; schedule callbacks; send self-serve links.</td></tr>
+      <tr><td><span class="tag confirm">Confirm first</span></td><td>Push software updates; remote-restart a terminal; order replacement hardware; change non-financial settings. State what will happen, get an explicit yes.</td></tr>
+      <tr><td><span class="tag never">Never</span></td><td>Discuss the reasons behind a risk or KYC hold; change payout accounts or financial settings; quote settlement amounts without verified data; promise refunds, credits or waivers; keep a merchant in troubleshooting after two failed fix cycles.</td></tr>
+    </table>
+  </div>
+  <div class="why-box">
+    <span class="lbl">Compliance guardrails · non-negotiable in all six markets</span>
+    <p>The AI discloses that it is an automated assistant at the start of every call (EU AI Act transparency obligation). Call recording and transcript use follow GDPR: consent and retention per market rules, and transcripts are anonymized before they are used for testing. The AI never asks for a full card number, and if a caller reads one aloud, the recording is redacted at that segment (PCI DSS). These are design constraints, not features: any workflow change is checked against them before release.</p>
+  </div>
+
+  <h2 id="s5"><span class="secnum">5</span>Edge cases: where this workflow will misbehave</h2>
+  <p>Edge cases are grouped by where they break the flow. Each one becomes a permanent test case in the stress-testing suite: found once, tested forever.</p>
+
+  <h3>Voice channel</h3>
+  <div class="table-scroll">
+    <table>
+      <tr><th style="width:32%">Edge case</th><th>Designed behavior</th></tr>
+      <tr><td>Noisy shop floor, music, espresso machine</td><td>ASR tuned and tested against in-domain noise; if transcription confidence drops, switch to short confirm-back questions rather than guessing.</td></tr>
+      <tr><td>Merchant interrupts mid-sentence (barge-in)</td><td>Stop speaking within ~200 ms, address the interruption, retain context. Tested explicitly, per branch.</td></tr>
+      <tr><td>Accents, second-language speakers, code-switching (a Danish merchant switching to English)</td><td>Language detection per utterance; respond in the merchant's dominant language; never silently switch.</td></tr>
+      <tr><td>Merchant puts the phone down to walk to the terminal; long silences</td><td>Distinguish "working silence" from "gone": announce wait expectations, re-prompt gently at intervals, offer a callback if the line stays dead.</td></tr>
+      <tr><td>Caller says "the system" but means the POS tablet, the printer, or the cash drawer</td><td>Device disambiguation early in branch F, driven by the product registry: "Is it the card terminal itself, or the screen you run orders on?"</td></tr>
+      <tr><td>Multiple terminals on the account</td><td>Identify which unit by asking for the terminal's screen name or last digits of the serial; never assume.</td></tr>
+      <tr><td>Caller is an employee, not the account owner</td><td>Troubleshooting: allowed. Account data and account changes: verification threshold not met, so offer to proceed with hardware steps only.</td></tr>
+    </table>
+  </div>
+
+  <h3>Diagnosis</h3>
+  <div class="table-scroll">
+    <table>
+      <tr><th style="width:32%">Edge case</th><th>Designed behavior</th></tr>
+      <tr><td>Conflicting signals: telemetry says online, merchant says dead</td><td>Trust neither alone. Run a terminal-to-host connection test or have the merchant attempt a payment; if it fails, treat telemetry as stale and follow the merchant's reality.</td></tr>
+      <tr><td>Merchant has already rebooted ("I tried that")</td><td>Believe them. Skip the step, say why the next step differs. Repeating known-failed steps destroys credibility.</td></tr>
+      <tr><td>Two problems at once (offline <i>and</i> account hold)</td><td>Fix the blocking one for revenue first (connectivity), then surface the second before closing. Never close on a half-fixed account.</td></tr>
+      <tr><td>Intermittent fault ("it works sometimes")</td><td>Do not force a binary diagnosis. Log a pattern-watch on telemetry, set expectations, schedule follow-up rather than a fake fix.</td></tr>
+      <tr><td>Symptom described in retrospect ("it didn't work this morning")</td><td>Check the transaction log for the time window instead of live troubleshooting a device that now works.</td></tr>
+      <tr><td>Classification confidence low twice in a row</td><td>Stop looping. Two clarification attempts maximum, then warm handoff. The merchant's patience is the budget.</td></tr>
+    </table>
+  </div>
+
+  <h3>Action &amp; trust</h3>
+  <div class="table-scroll">
+    <table>
+      <tr><th style="width:32%">Edge case</th><th>Designed behavior</th></tr>
+      <tr><td>Fix verified failed twice</td><td>Hard stop. Escalate with everything tried. Never a third loop.</td></tr>
+      <tr><td>Merchant demands a human immediately</td><td>Comply on the first request, gracefully, with context passed. The human path is a feature, not a failure. No retention scripts.</td></tr>
+      <tr><td>Anger, distress, or a threat to churn detected</td><td>Sentiment triggers escalation priority even if the diagnosis is going well.</td></tr>
+      <tr><td>Terminal battery dead or device unusable during the call</td><td>Switch channel: steps by SMS or email, callback scheduled after a charging window.</td></tr>
+      <tr><td>The AI's own signal sources fail (telemetry or transaction APIs down, possibly during the very platform incident being diagnosed)</td><td>Degrade honestly: fall back to question-driven diagnosis with reduced autonomy and say the systems are temporarily unavailable. If the Voice AI itself is degraded, route straight to a human with honest queue messaging. Design for missing data, not only wrong data.</td></tr>
+      <tr><td>Mass incident: a sudden spike of the same symptom</td><td>Spike detection flips branch A into broadcast mode: a short queue-buster message, status page, callback list. Protects human capacity for true edge cases.</td></tr>
+      <tr><td>After-hours call, human queue closed</td><td>Say so honestly, take a structured callback booking, send self-serve steps in writing. Never simulate a human queue that doesn't exist.</td></tr>
+    </table>
+  </div>
+
+  <h2 id="s6"><span class="secnum">6</span>Escalation and handoff</h2>
+  <div class="cols-3">
+    <div class="col-card">
+      <h3>Triggers</h3>
+      <ul>
+        <li><b>Deterministic:</b> branch D (account holds); two failed fix cycles; verification failure on account actions; repeat contact within 7 days.</li>
+        <li><b>Model-signaled:</b> low classification confidence after two loops; negative sentiment threshold; explicit human request.</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <h3>Context package</h3>
+      <ul>
+        <li><b>Who:</b> merchant, market, product suite, verified level.</li>
+        <li><b>What:</b> symptom in the merchant's words + branch classification.</li>
+        <li><b>Signals:</b> telemetry, transaction log, account flags checked.</li>
+        <li><b>Done:</b> every step tried, with outcomes.</li>
+        <li><b>State:</b> sentiment note and what the merchant was promised.</li>
+      </ul>
+    </div>
+    <div class="col-card">
+      <h3>Transfer mechanics</h3>
+      <ul>
+        <li>Warm transfer with a whisper brief to the receiving agent.</li>
+        <li>Route by branch to the right queue (risk/KYC is not the hardware queue).</li>
+        <li>Manage dead air: tell the merchant what is happening.</li>
+        <li>Hard rule: <b>the merchant never repeats themselves.</b></li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 id="s7"><span class="secnum">7</span>Localization: one workflow, six market overlays</h2>
+  <p>Denmark, Finland, France, Germany, Italy, and the UK differ in language, product suite, compliance, and self-serve surfaces. The design principle: <b>localize behavior, not logic.</b> One canonical workflow, with a per-market overlay that parameterizes it. Six forked workflows would drift apart within a quarter; a shared flow with overlays keeps every improvement global by default.</p>
+  <div class="table-scroll">
+    <table>
+      <tr><th style="width:24%">Overlay dimension</th><th>Examples of what varies</th></tr>
+      <tr><td>Language &amp; ASR</td><td>Per-market speech models and phrasing; per-utterance language detection; tested noise and accent sets per language.</td></tr>
+      <tr><td>Product suite</td><td>Terminal-only vs. full POS bundle (screen, printer, cash drawer) changes device disambiguation and fix scripts.</td></tr>
+      <tr><td>Compliance</td><td>Fiscal rules, such as TSE requirements in Germany, constrain what a "safe fix" is: an action that breaks fiscal logging is never autonomous in that market.</td></tr>
+      <tr><td>Self-serve surfaces</td><td>What the merchant can be sent a link to do themselves differs per market; branch scripts reference the local surface, never a global one.</td></tr>
+      <tr><td>Escalation targets</td><td>Local queue hours, languages, and specialist coverage; after-hours behavior configured per market.</td></tr>
+    </table>
+  </div>
+  <p>Rollout follows the same shape: prove the canonical workflow in one market, then add overlays one market at a time, with the market's support leads reviewing scripts before go-live.</p>
+
+  <h2 id="s8"><span class="secnum">8</span>Stress-testing before a live merchant hears it</h2>
+  <div class="table-scroll">
+    <table>
+      <tr><th style="width:22%">Layer</th><th style="width:46%">Method</th><th>Pass criteria (targets)</th></tr>
+      <tr><td><b>1 · Branch logic</b></td><td>Decision-table tests: every branch, every permission gate, every edge case in section 5 as an executable test case.</td><td>100% of defined cases route correctly; no undefined states.</td></tr>
+      <tr><td><b>2 · Transcript replay</b></td><td>Replay historical tickets and call transcripts through classification; compare to known root causes.</td><td>Classification agreement with resolved history of at least 90%, a provisional bar to be reset from the first replay baseline, before pilot.</td></tr>
+      <tr><td><b>3 · Adversarial personas</b></td><td>Scripted difficult callers: furious, rambling, wrong-device, already-tried-everything, non-native speaker, silent.</td><td>No loop past two cycles; graceful handoff in every failed run.</td></tr>
+      <tr><td><b>4 · Voice reliability</b></td><td>ASR word-error rate on clean and in-domain noisy audio; barge-in stop latency and context retention; end-to-end latency.</td><td>WER under 5% clean, under 10% on tuned in-domain noisy audio; barge-in stop within 200 ms with context retained; latency under ~800 ms (published voice-QA baselines; re-baseline on Flatpay audio).</td></tr>
+      <tr><td><b>5 · Shadow mode</b></td><td>AI listens to live calls and proposes diagnosis and next step; humans act. Measure agreement between AI proposal and human action.</td><td>Sustained agreement threshold met before any autonomous rollout.</td></tr>
+      <tr><td><b>6 · Staged rollout</b></td><td>One market, lowest-risk branches first (B, E). Branch D never launches autonomous.</td><td>Metrics in section 9 hold for two review cycles before expansion.</td></tr>
+    </table>
+  </div>
+
+  <h2 id="s9"><span class="secnum">9</span>Measuring what matters after launch</h2>
+  <p><b>Containment is not resolution.</b> An AI that "handled the call" while the merchant still cannot take payments has failed twice: it failed the merchant, and it hid the failure from the team. This workflow has an unusual advantage: resolution is objectively verifiable.</p>
+  <div class="why-box">
+    <span class="lbl">Ground-truth metric · verified resolution</span>
+    <p>For hardware and connectivity fixes (branches B, C): the terminal processes a live transaction within 15 minutes of call end, observed in telemetry; the window is tuned from transaction-gap data per merchant type. Not "the caller didn't escalate." Not a survey. A payment. The other branches get their own success definitions: incident communicated and callback kept (A), case with the right specialist inside the SLA (D), merchant confirms understanding (E).</p>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <tr><th style="width:32%">Metric</th><th>What it protects against</th></tr>
+      <tr><td>Verified resolution rate (per branch)</td><td>Deflection dressed up as success; shows exactly which branches earn autonomy and which don't.</td></tr>
+      <tr><td>Escalation rate with reason codes</td><td>Silent overload of human agents; reason codes rank what to build next.</td></tr>
+      <tr><td>Repeat contact within 7 days</td><td>Fake fixes that bounce back; the single best detector of a workflow that closes too eagerly.</td></tr>
+      <tr><td>Handoff quality (did the merchant repeat themselves?)</td><td>Warm transfer decaying into cold transfer; audited via transcript sampling.</td></tr>
+      <tr><td>Merchant satisfaction, AI-closed vs. human-closed calls</td><td>Resolution achieved at the cost of trust.</td></tr>
+    </table>
+  </div>
+  <p><b>The improvement loop:</b> a weekly review of escalations, repeat contacts, and failed verifications. Each failure is classified: missing signal, missing branch, bad script, or model error. Fixes are prioritized by calls affected times resolution lift, and each becomes a new test case in the stress-testing suite. New data-source investments (for example connecting router diagnostics, or logistics tracking for replacements, to be validated with ops and logistics) are ranked the same way. Per-branch targets should be set from Flatpay's own replay baseline rather than industry averages, which vary widely with how loosely "resolved" is defined. That definition discipline is the point of the ground-truth metric above.</p>
+
+  <h2 id="s10"><span class="secnum">10</span>Assumptions and how to validate them</h2>
+  <p>The design depends on eight working assumptions about Flatpay internals, made to keep it concrete rather than generic. Each is listed with the fastest way to validate it through expert interviews and production data; none is stated as fact anywhere in this specification.</p>
+  <div class="table-scroll">
+    <table>
+      <tr><th style="width:8%">Marker</th><th style="width:56%">Assumption</th><th>Fastest validation</th></tr>
+      <tr><td><sup class="am">A1</sup></td><td>"Terminal won't take payments" is among the highest-volume call types.</td><td>Ticket and call categorization data.</td></tr>
+      <tr><td><sup class="am">A2</sup></td><td>Terminals report status (heartbeat, connectivity, firmware) to a central system.</td><td>Platform/AI team, 15 minutes.</td></tr>
+      <tr><td><sup class="am">A3</sup></td><td>A fallback payment path (payment link or manual entry) exists in at least some markets.</td><td>Product specialists per market.</td></tr>
+      <tr><td><sup class="am">A4</sup></td><td>Terminals support SIM/Wi-Fi failover the AI can guide or trigger.</td><td>Hardware product owner.</td></tr>
+      <tr><td><sup class="am">A5</sup></td><td>German fiscal (TSE) rules constrain which fixes may run without human sign-off.</td><td>Compliance or DE market lead.</td></tr>
+      <tr><td><sup class="am">A6</sup></td><td>90% classification agreement on transcript replay is an achievable pre-pilot bar.</td><td>Set from a first replay baseline with the AI team.</td></tr>
+      <tr><td><sup class="am">A7</sup></td><td>A 15-minute post-call window is a fair verification period for most merchant types.</td><td>Tune from transaction-gap data per vertical.</td></tr>
+      <tr><td><sup class="am">A8</sup></td><td>Router diagnostics and replacement-logistics tracking are realistic future data sources.</td><td>Ops and logistics teams.</td></tr>
+    </table>
+  </div>
+
+  <h2 id="s11"><span class="secnum">11</span>Design principles behind the specification</h2>
+  <div class="principles">
+    <div class="principle"><b>Workflows over free agents.</b> Deterministic control flow with model judgment inside steps: reliability first, autonomy earned per branch.</div>
+    <div class="principle"><b>Compose signals; don't recite FAQs.</b> If a system can answer it, never ask the merchant.</div>
+    <div class="principle"><b>Verify with ground truth.</b> A resolution is a processed payment, not a polite goodbye.</div>
+    <div class="principle"><b>The human path is a feature.</b> Escalation is designed with the same care as automation, and asking for a human always works the first time.</div>
+    <div class="principle"><b>Localize behavior, not logic.</b> One canonical flow, market overlays on top.</div>
+    <div class="principle"><b>Every production failure becomes a permanent test.</b> The edge-case library only grows.</div>
+  </div>
+
+  <p class="small" style="margin-top:24px">Method informed by published practice on agentic system design (Anthropic), voice-agent quality benchmarks (ASR, barge-in, latency), and support-metrics research on containment vs. verified resolution. Prepared without inside knowledge of Flatpay's systems: every dependency on internals is written as a working assumption and consolidated in the section above.</p>
+
+  <div class="wf-foot">
+    <span>Adam Grøfte Barfod · <a href="mailto:adam0406@gmail.com">adam0406@gmail.com</a> · <a href="tel:+4541624530">+45 41 62 45 30</a></span>
+    <span><a href="index.html">Back to the roadmap</a> · <a href="Flatpay-Agentic-Workflow-Design-Adam-Barfod.pdf" download>Spec PDF</a> · July 2026</span>
+  </div>
+
+</main>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
