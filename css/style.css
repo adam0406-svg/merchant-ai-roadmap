@@ -896,6 +896,7 @@ html:not(.js) .maxis { stroke-dashoffset: 0; }
   border-radius: 0 16px 16px 0; padding: 16px 20px; margin: 0 0 20px;
   font-size: 0.92rem; line-height: 1.65;
 }
+.sim-refs { margin: -8px 0 20px; font-size: 0.82rem; color: var(--muted); }
 html.sim-js .sim-nojs { display: none; }
 .sim-presets { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 6px; }
 .sim-preset {
@@ -1404,6 +1405,10 @@ sup.am { font-family: var(--mono); font-size: 0.6rem; color: #fff; background: v
 .principle b { color: var(--green); font-weight: 800; }
 
 .small { font-size: 0.8rem; color: var(--muted); }
+
+.refs { margin: 8px 0 0; padding-left: 18px; font-size: 0.86rem; line-height: 1.6; }
+.refs li { margin-bottom: 7px; }
+.refs a { color: var(--green); }
 
 .wf-foot { border-top: 1px solid var(--border); margin-top: 60px; padding-top: 26px; font-family: var(--mono); font-size: 0.74rem; color: var(--muted); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .wf-foot a { color: var(--green); }

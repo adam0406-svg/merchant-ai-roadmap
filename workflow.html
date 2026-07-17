@@ -51,7 +51,7 @@
 
   <div class="why-box">
     <span class="lbl">Purpose and scope</span>
-    <p>This document specifies an agentic workflow for a merchant-facing Voice AI handling one high-stakes call type, <span class="quote">"My terminal won't take payments"</span>, end to end: problem framing, signal composition, flow design, permissions, edge cases, escalation, localization, stress-testing, and post-launch measurement. Scope covers one call type across six markets (DK, FI, FR, DE, IT, UK). Status: a design prepared for validation, without inside knowledge of Flatpay's systems; every dependency on internals is written as a working assumption and consolidated with its fastest validation path in the assumptions section. Intended readers: support leadership and the AI team.</p>
+    <p>This document specifies an agentic workflow for a merchant-facing Voice AI handling one high-stakes call type, <span class="quote">"My terminal won't take payments"</span>, end to end: problem framing, signal composition, flow design, permissions, edge cases, escalation, localization, stress-testing, and post-launch measurement. Scope covers one call type across six markets (DK, FI, FR, DE, IT, UK). Status: a product-design level specification prepared for validation, before engineering discovery, without inside knowledge of Flatpay's systems; every dependency on internals is written as a working assumption and consolidated with its fastest validation path in the assumptions section. Intended readers: support leadership and the AI team.</p>
   </div>
 
   <h2 class="glance">The specification at a glance</h2>
@@ -91,7 +91,7 @@
     </table>
   </div>
   <p>This is why the workflow cannot be built from FAQ content. Merchants describe symptoms, in their own words, under stress. Root causes live in systems. <b>The design job is orchestration: composing what the merchant says with what the systems show, and routing to the fix.</b></p>
-  <p><b>Why this workflow first:</b> highest urgency of any call type (revenue stops), high expected volume, to be confirmed against ticket data, and unusually high resolution potential, because most root causes are checkable and fixable through signals the AI can reach.</p>
+  <p><b>Why this workflow first:</b> a strong candidate for early validation because the problem is urgent, system-observable and potentially resolvable. Actual volume and feasibility would be confirmed from call, ticket and platform data before any build decision.</p>
 
   <h2 id="s2"><span class="secnum">2</span>Signal map: check before you ask</h2>
   <p>A great support agent doesn't ask "is it plugged in?" when the dashboard shows the terminal heartbeating. The AI should reach for signals first and use questions to disambiguate, not to gather what systems already know.</p>
@@ -305,7 +305,19 @@
     <div class="principle"><b>Every production failure becomes a permanent test.</b> The edge-case library only grows.</div>
   </div>
 
-  <p class="small" style="margin-top:24px">Method informed by published practice on agentic system design (Anthropic), voice-agent quality benchmarks (ASR, barge-in, latency), and support-metrics research on containment vs. verified resolution. Prepared without inside knowledge of Flatpay's systems: every dependency on internals is written as a working assumption and consolidated in the section above.</p>
+  <h3>Standards and practice this design leans on</h3>
+  <ul class="refs">
+    <li><a href="https://www.anthropic.com/engineering/building-effective-agents" rel="noopener">Anthropic, Building Effective AI Agents</a>: the workflows-over-agents control flow at the core of section 3, with model judgment inside steps and deterministic rules between them.</li>
+    <li><a href="https://artificialintelligenceact.eu/article/50/" rel="noopener">EU AI Act, Article 50</a>: disclosure that the caller is interacting with an AI, at the start of every call.</li>
+    <li><a href="https://www.pcisecuritystandards.org/documents/protecting_telephone-based_payment_card_data.pdf" rel="noopener">PCI SSC, Protecting Telephone-based Payment Card Data</a>: card numbers never requested, recordings redacted if one is read aloud.</li>
+    <li><a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" rel="noopener">GDPR, Regulation (EU) 2016/679</a>: consent, retention and transcript anonymization per market.</li>
+    <li><a href="https://www.nist.gov/itl/ai-risk-management-framework" rel="noopener">NIST AI Risk Management Framework</a> and <a href="https://www.iso.org/standard/81230.html" rel="noopener">ISO/IEC 42001</a>: the staged shadow, assisted, autonomous rollout, human oversight and per-branch measurement are aligned with these frameworks (aligned with, not certified against).</li>
+    <li><a href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022R2554" rel="noopener">DORA, Regulation (EU) 2022/2554</a>: the honest degraded mode and incident handling are consistent with its operational-resilience themes for payment firms.</li>
+    <li><a href="https://kassensichv.com/" rel="noopener">KassenSichV (DE fiscal device rules, TSE)</a>: why software changes to fiscal devices in the DE overlay are never autonomous pending validation.</li>
+    <li>Contact-center practice (<a href="https://www.copc.com/" rel="noopener">COPC CX Standard</a>, ICMI): first-contact resolution and repeat-contact rate as quality metrics, and the containment vs. resolution distinction in section 9. Practitioner guidance, not a formal standard.</li>
+    <li><a href="https://hamming.ai/resources/voice-agent-evaluation-metrics-guide" rel="noopener">Published voice-agent QA benchmarks</a>: source of the provisional WER, barge-in and latency targets in section 8, to be re-baselined on Flatpay audio.</li>
+  </ul>
+  <p class="small" style="margin-top:24px">Prepared without inside knowledge of Flatpay's systems: every dependency on internals is written as a working assumption and consolidated in the section above.</p>
 
   <div class="wf-foot">
     <span>Adam Grøfte Barfod · <a href="mailto:adam0406@gmail.com">adam0406@gmail.com</a> · <a href="tel:+4541624530">+45 41 62 45 30</a></span>
