@@ -30,7 +30,7 @@
   </div>
 </header>
 
-<section class="wf-hero">
+<section class="wf-hero" id="top">
   <div class="container">
     <p class="kicker rv">Phase 03 · Design · the full specification</p>
     <h1 class="rv" style="--d:.08s">Designing for resolution, not deflection</h1>
@@ -39,7 +39,7 @@
     <div class="hero-actions rv" style="--d:.28s">
       <a class="btn solid" href="Flatpay-Agentic-Workflow-Design-Adam-Barfod.pdf" download>
         Download this spec as PDF
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M4 19h16"/></svg>
+        <svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><path d="M4 19h16"/></svg>
       </a>
       <span class="hero-note">12 pages · the same content as this page</span>
     </div>
@@ -54,18 +54,20 @@
     <p>This document specifies an agentic workflow for a merchant-facing Voice AI handling one high-stakes call type, <span class="quote">"My terminal won't take payments"</span>, end to end: problem framing, signal composition, flow design, permissions, edge cases, escalation, localization, stress-testing, and post-launch measurement. Scope covers one call type across six markets (DK, FI, FR, DE, IT, UK). Status: a design prepared for validation, without inside knowledge of Flatpay's systems; every dependency on internals is written as a working assumption and consolidated with its fastest validation path in the assumptions section. Intended readers: support leadership and the AI team.</p>
   </div>
 
-  <h3>The specification at a glance · sections 1 to 9</h3>
-  <div class="pipeline">
-    <span><b>1</b>Frame</span>
-    <span><b>2</b>Signals</span>
-    <span><b>3</b>Flow</span>
-    <span><b>4</b>Permissions</span>
-    <span><b>5</b>Edge cases</span>
-    <span><b>6</b>Handoff</span>
-    <span><b>7</b>Localization</span>
-    <span><b>8</b>Testing</span>
-    <span><b>9</b>Metrics</span>
-  </div>
+  <h2 class="glance">The specification at a glance</h2>
+  <nav class="pipeline" aria-label="Specification sections">
+    <a href="#s1"><b>1</b>Frame</a>
+    <a href="#s2"><b>2</b>Signals</a>
+    <a href="#s3"><b>3</b>Flow</a>
+    <a href="#s4"><b>4</b>Permissions</a>
+    <a href="#s5"><b>5</b>Edge cases</a>
+    <a href="#s6"><b>6</b>Handoff</a>
+    <a href="#s7"><b>7</b>Localization</a>
+    <a href="#s8"><b>8</b>Testing</a>
+    <a href="#s9"><b>9</b>Metrics</a>
+    <a href="#s10"><b>10</b>Assumptions</a>
+    <a href="#s11"><b>11</b>Principles</a>
+  </nav>
   <div class="stats-paper">
     <div class="stat"><div class="n">6</div><div class="c">diagnosis branches</div></div>
     <div class="stat"><div class="n">20</div><div class="c">edge cases designed for</div></div>
@@ -78,7 +80,8 @@
   <p>The sentence sounds like one problem. It is at least six, spread across different systems, and only some of them are about the terminal:</p>
   <div class="table-scroll">
     <table>
-      <tr><th style="width:34%">What the merchant says</th><th style="width:30%">What may actually be wrong</th><th>Where the truth lives</th></tr>
+      <caption class="vh">Six readings of one reported symptom</caption>
+      <tr><th scope="col" style="width:34%">What the merchant says</th><th scope="col" style="width:30%">What may actually be wrong</th><th scope="col">Where the truth lives</th></tr>
       <tr><td>"It won't take payments" / "It's dead" / "Nothing happens"</td><td>Local connectivity is down (Wi-Fi, SIM, router)</td><td>Terminal telemetry, network heartbeat</td></tr>
       <tr><td>"It keeps saying error" / "It rejects the card"</td><td>Card-side declines (issuer, not merchant)</td><td>Transaction log, decline codes</td></tr>
       <tr><td>"It froze" / "The screen is stuck"</td><td>Device fault or pending software update</td><td>Device status, firmware version</td></tr>
@@ -94,7 +97,8 @@
   <p>A great support agent doesn't ask "is it plugged in?" when the dashboard shows the terminal heartbeating. The AI should reach for signals first and use questions to disambiguate, not to gather what systems already know.</p>
   <div class="table-scroll">
     <table>
-      <tr><th style="width:20%">Source</th><th style="width:42%">Signals</th><th>What it distinguishes</th></tr>
+      <caption class="vh">Signal sources and what each distinguishes</caption>
+      <tr><th scope="col" style="width:20%">Source</th><th scope="col" style="width:42%">Signals</th><th scope="col">What it distinguishes</th></tr>
       <tr><td>Terminal telemetry, where terminals report status to a central system</td><td>Online/offline, last heartbeat, battery, firmware version, error state</td><td>Connectivity vs. device fault vs. "actually fine"</td></tr>
       <tr><td>Transaction log</td><td>Recent attempts, outcomes, decline codes, last successful payment</td><td>"No attempts arriving" vs. "attempts arriving and declined"</td></tr>
       <tr><td>Account status</td><td>Settlement state, KYC/risk holds, payout blocks</td><td>Hardware problem vs. account problem</td></tr>
@@ -137,7 +141,8 @@
   <h2 id="s4"><span class="secnum">4</span>What the AI may do: permissions</h2>
   <div class="table-scroll">
     <table>
-      <tr><th style="width:16%">Level</th><th>Actions</th></tr>
+      <caption class="vh">Permission levels and allowed actions</caption>
+      <tr><th scope="col" style="width:16%">Level</th><th scope="col">Actions</th></tr>
       <tr><td><span class="tag auto">Autonomous</span></td><td>Read any signal; guide reboot and network recovery; explain decline codes; resend receipts; create and update tickets; schedule callbacks; send self-serve links.</td></tr>
       <tr><td><span class="tag confirm">Confirm first</span></td><td>Push software updates; remote-restart a terminal; order replacement hardware; change non-financial settings. State what will happen, get an explicit yes.</td></tr>
       <tr><td><span class="tag never">Never</span></td><td>Discuss the reasons behind a risk or KYC hold; change payout accounts or financial settings; quote settlement amounts without verified data; promise refunds, credits or waivers; keep a merchant in troubleshooting after two failed fix cycles.</td></tr>
@@ -154,7 +159,8 @@
   <h3>Voice channel</h3>
   <div class="table-scroll">
     <table>
-      <tr><th style="width:32%">Edge case</th><th>Designed behavior</th></tr>
+      <caption class="vh">Voice-channel edge cases and designed behavior</caption>
+      <tr><th scope="col" style="width:32%">Edge case</th><th scope="col">Designed behavior</th></tr>
       <tr><td>Noisy shop floor, music, espresso machine</td><td>ASR tuned and tested against in-domain noise; if transcription confidence drops, switch to short confirm-back questions rather than guessing.</td></tr>
       <tr><td>Merchant interrupts mid-sentence (barge-in)</td><td>Stop speaking within ~200 ms (a provisional target, to be re-baselined on Flatpay's own audio), address the interruption, retain context. Tested explicitly, per branch.</td></tr>
       <tr><td>Accents, second-language speakers, code-switching (a Danish merchant switching to English)</td><td>Language detection per utterance; respond in the merchant's dominant language; never silently switch.</td></tr>
@@ -168,7 +174,8 @@
   <h3>Diagnosis</h3>
   <div class="table-scroll">
     <table>
-      <tr><th style="width:32%">Edge case</th><th>Designed behavior</th></tr>
+      <caption class="vh">Diagnosis edge cases and designed behavior</caption>
+      <tr><th scope="col" style="width:32%">Edge case</th><th scope="col">Designed behavior</th></tr>
       <tr><td>Conflicting signals: telemetry says online, merchant says dead</td><td>Trust neither alone. Run a terminal-to-host connection test or have the merchant attempt a payment; if it fails, treat telemetry as stale and follow the merchant's reality.</td></tr>
       <tr><td>Merchant has already rebooted ("I tried that")</td><td>Believe them. Skip the step, say why the next step differs. Repeating known-failed steps destroys credibility.</td></tr>
       <tr><td>Two problems at once (offline <i>and</i> account hold)</td><td>Identify all active blockers. Resolve or escalate the blocker that currently determines payment availability, and carry secondary faults in the case context. An account-level restriction can block payments even with a healthy terminal.</td></tr>
@@ -181,7 +188,8 @@
   <h3>Action &amp; trust</h3>
   <div class="table-scroll">
     <table>
-      <tr><th style="width:32%">Edge case</th><th>Designed behavior</th></tr>
+      <caption class="vh">Action and trust edge cases and designed behavior</caption>
+      <tr><th scope="col" style="width:32%">Edge case</th><th scope="col">Designed behavior</th></tr>
       <tr><td>Fix verified failed twice</td><td>Hard stop. Escalate with everything tried. Never a third loop.</td></tr>
       <tr><td>Merchant demands a human immediately</td><td>Comply on the first request, gracefully, with context passed. The human path is a feature, not a failure. No retention scripts.</td></tr>
       <tr><td>Anger, distress, or a threat to churn detected</td><td>Sentiment triggers escalation priority even if the diagnosis is going well.</td></tr>
@@ -226,7 +234,8 @@
   <p>Denmark, Finland, France, Germany, Italy, and the UK differ in language, product suite, compliance, and self-serve surfaces. The design principle: <b>localize behavior, not logic.</b> One canonical workflow, with a per-market overlay that parameterizes it. Six forked workflows would drift apart within a quarter; a shared flow with overlays keeps every improvement global by default.</p>
   <div class="table-scroll">
     <table>
-      <tr><th style="width:24%">Overlay dimension</th><th>Examples of what varies</th></tr>
+      <caption class="vh">Market overlay dimensions</caption>
+      <tr><th scope="col" style="width:24%">Overlay dimension</th><th scope="col">Examples of what varies</th></tr>
       <tr><td>Language &amp; ASR</td><td>Per-market speech models and phrasing; per-utterance language detection; tested noise and accent sets per language.</td></tr>
       <tr><td>Product suite</td><td>Terminal-only vs. full POS bundle (screen, printer, cash drawer) changes device disambiguation and fix scripts.</td></tr>
       <tr><td>Compliance</td><td>Fiscal rules, such as TSE requirements in Germany, constrain what a "safe fix" is: an action that breaks fiscal logging is never autonomous in that market.</td></tr>
@@ -239,7 +248,8 @@
   <h2 id="s8"><span class="secnum">8</span>Stress-testing before a live merchant hears it</h2>
   <div class="table-scroll">
     <table>
-      <tr><th style="width:22%">Layer</th><th style="width:46%">Method</th><th>Pass criteria (targets)</th></tr>
+      <caption class="vh">Six test layers with methods and pass criteria</caption>
+      <tr><th scope="col" style="width:22%">Layer</th><th scope="col" style="width:46%">Method</th><th scope="col">Pass criteria (targets)</th></tr>
       <tr><td><b>1 · Branch logic</b></td><td>Decision-table tests: every branch, every permission gate, every edge case in section 5 as an executable test case.</td><td>100% of defined cases route correctly; no undefined states.</td></tr>
       <tr><td><b>2 · Transcript replay</b></td><td>Replay historical tickets and call transcripts through classification; compare to known root causes.</td><td>Classification agreement with resolved history of at least 90%, a provisional bar to be reset from the first replay baseline, before pilot.</td></tr>
       <tr><td><b>3 · Adversarial personas</b></td><td>Scripted difficult callers: furious, rambling, wrong-device, already-tried-everything, non-native speaker, silent.</td><td>No loop past two cycles; graceful handoff in every failed run.</td></tr>
@@ -257,7 +267,8 @@
   </div>
   <div class="table-scroll">
     <table>
-      <tr><th style="width:32%">Metric</th><th>What it protects against</th></tr>
+      <caption class="vh">Post-launch metrics and what each protects against</caption>
+      <tr><th scope="col" style="width:32%">Metric</th><th scope="col">What it protects against</th></tr>
       <tr><td>Verified resolution rate (per branch)</td><td>Deflection dressed up as success; shows exactly which branches earn autonomy and which don't.</td></tr>
       <tr><td>Escalation rate with reason codes</td><td>Silent overload of human agents; reason codes rank what to build next.</td></tr>
       <tr><td>Repeat contact within 7 days</td><td>Fake fixes that bounce back; the single best detector of a workflow that closes too eagerly.</td></tr>
@@ -271,7 +282,8 @@
   <p>The design depends on eight working assumptions about Flatpay internals, made to keep it concrete rather than generic. Each is listed with the fastest way to validate it through expert interviews and production data; none is stated as fact anywhere in this specification.</p>
   <div class="table-scroll">
     <table>
-      <tr><th style="width:8%">Marker</th><th style="width:56%">Assumption</th><th>Fastest validation</th></tr>
+      <caption class="vh">Working assumptions and fastest validation paths</caption>
+      <tr><th scope="col" style="width:8%">Marker</th><th scope="col" style="width:56%">Assumption</th><th scope="col">Fastest validation</th></tr>
       <tr><td><sup class="am">A1</sup></td><td>"Terminal won't take payments" is among the highest-volume call types.</td><td>Ticket and call categorization data.</td></tr>
       <tr><td><sup class="am">A2</sup></td><td>Terminals report status (heartbeat, connectivity, firmware) to a central system.</td><td>Platform/AI team, 15 minutes.</td></tr>
       <tr><td><sup class="am">A3</sup></td><td>A fallback payment path (payment link or manual entry) exists in at least some markets.</td><td>Product specialists per market.</td></tr>
@@ -302,6 +314,8 @@
 
 </main>
 </div>
+
+<a class="to-top" href="#top" aria-label="Back to top">&#8593;</a>
 
 <script src="js/main.js"></script>
 </body>

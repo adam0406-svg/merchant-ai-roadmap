@@ -192,6 +192,20 @@
     });
   }
 
+  /* ---------- floating back-to-top (workflow page) ---------- */
+  var toTop = document.querySelector('.to-top');
+  if (toTop) {
+    var ttTick = false;
+    var ttUpdate = function () {
+      toTop.classList.toggle('show', window.pageYOffset > 600);
+      ttTick = false;
+    };
+    window.addEventListener('scroll', function () {
+      if (!ttTick) { ttTick = true; requestAnimationFrame(ttUpdate); }
+    }, { passive: true });
+    ttUpdate();
+  }
+
   /* ---------- embedded (in-overlay) mode for the spec page ---------- */
   if (location.search.indexOf('embed=1') !== -1) {
     document.documentElement.classList.add('embed');
