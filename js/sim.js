@@ -570,18 +570,14 @@
     });
   }
 
-  /* ---------- decision trace console ---------- */
-  var trace = el('div', 'console sim-console');
-  var traceBar = elHtml('div', 'console-bar',
-    '<span class="ps-tab">' + icon('<polyline points="4 5 12 12 4 19"/><line x1="13" y1="19" x2="20" y2="19"/>', 12) + 'Decision trace · rules fired in priority order</span>' +
-    '<span class="cstatus">deterministic · runs in your browser</span>');
-  var traceBody = el('div', 'console-body sim-trace-body');
-  traceBody.setAttribute('aria-live', 'polite');
-  trace.appendChild(traceBar);
-  trace.appendChild(traceBody);
-  var traceScan = el('span', 'scan');
-  traceScan.setAttribute('aria-hidden', 'true');
-  trace.appendChild(traceScan);
+  /* ---------- decision trace: rule nodes on a trunk ---------- */
+  var trace = el('div', 'sim-tracepanel');
+  trace.appendChild(elHtml('h4', 'sim-col-h',
+    icon('<line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="12" x2="5" y2="6"/><line x1="12" y1="12" x2="12" y2="4"/><line x1="12" y1="12" x2="19" y2="6"/><polyline points="5 9 5 6 8 6"/><polyline points="10 6 12 4 14 6"/><polyline points="16 6 19 6 19 9"/>', 13) +
+    'Decision trace · rules fired in priority order <span class="sim-col-note">deterministic, runs in your browser</span>'));
+  var traceList = el('ol', 'sim-tracelist');
+  traceList.setAttribute('aria-live', 'polite');
+  trace.appendChild(traceList);
 
   /* ---------- permissions ---------- */
   var permsWrap = el('div', 'sim-perms');
@@ -632,12 +628,18 @@
     void decisionCard.offsetWidth;
     decisionCard.classList.add('boot');
 
-    /* trace console */
-    traceBody.innerHTML = '';
+    /* trace list */
+    traceList.innerHTML = '';
+    var packet = el('span', 'sim-trace-packet');
+    packet.setAttribute('aria-hidden', 'true');
+    traceList.appendChild(packet);
     r.firedRules.forEach(function (s, i) {
-      var p = el('p', 'sim-trace-line', s);
-      p.style.animationDelay = (0.08 + i * 0.14).toFixed(2) + 's';
-      traceBody.appendChild(p);
+      var m = s.match(/^Rule (\d+) · ([\s\S]*)$/);
+      var li = el('li', 'sim-trace-li');
+      li.style.animationDelay = (0.08 + i * 0.14).toFixed(2) + 's';
+      li.appendChild(el('span', 'sim-trace-n', m ? m[1] : '·'));
+      li.appendChild(el('span', 'sim-trace-t', m ? m[2] : s));
+      traceList.appendChild(li);
     });
 
     /* permissions */
@@ -654,45 +656,76 @@
     });
   }
 
-  /* ---------- test panel ---------- */
+  /* ---------- scenario test suite ---------- */
   var testPanel = el('div', 'sim-tests');
-  var testBtn = elHtml('button', 'sim-run-tests', icon('<polygon points="7 4.5 19.5 12 7 19.5"/>', 13) + 'Run all scenario tests');
-  testBtn.type = 'button';
+  var testsHead = elHtml('div', 'sim-tests-head',
+    icon('<path d="M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/><line x1="8.5" y1="3" x2="15.5" y2="3"/><line x1="8" y1="15" x2="16" y2="15"/>', 14) +
+    '<h4>Scenario test suite</h4><span class="sim-tests-badge">' + PRESETS.length + ' scripted scenarios · stored expected outputs</span>');
   var testNote = el('p', 'sim-tests-note',
     'Logic tests of the decision table against the scripted scenarios above: the stress-testing discipline from phase 4 applied to this model.');
-  var testHow = el('p', 'sim-tests-note',
-    'How it works: each of the ' + PRESETS.length + ' scenarios stores its expected result (branch, mode, escalation trigger and the full structured output). This button feeds every scenario through the decision rules again, live in your browser, and compares what the engine returns with what is stored. A match is PASS; any drift, for example after a rule change, shows as FAIL with the exact difference.');
-  var testWhy = el('p', 'sim-tests-note',
-    'Why do they all pass? Because the expected outputs were written together with the rules: the model was built until every scripted scenario matched its expectation. The value is in the future, not today. Change any rule and the affected scenarios fail immediately, which is how a decision table stays trustworthy as it evolves.');
+  var testInfo = document.createElement('details');
+  testInfo.className = 'sim-tests-info';
+  var testInfoSum = document.createElement('summary');
+  testInfoSum.textContent = 'How it works, and why every scenario passes today';
+  testInfo.appendChild(testInfoSum);
+  testInfo.appendChild(el('p', null,
+    'Each of the ' + PRESETS.length + ' scenarios stores its expected result: branch, mode, escalation trigger and the full structured output. Running the suite feeds every scenario through the decision rules again, live in your browser, and compares what the engine returns with what is stored, field by field. A match is PASS; any drift shows as FAIL with the exact difference.'));
+  testInfo.appendChild(el('p', null,
+    'Why do they all pass? Because the expected outputs were written together with the rules: the model was built until every scripted scenario matched its expectation. The value is in the future, not today. Change any rule and the affected scenarios fail immediately, which is how a decision table stays trustworthy as it evolves.'));
+  var testBtn = elHtml('button', 'sim-run-tests', icon('<polygon points="7 4.5 19.5 12 7 19.5"/>', 13) + 'Run all scenario tests');
+  testBtn.type = 'button';
   var testResults = el('div', 'sim-test-results');
   testResults.setAttribute('aria-live', 'polite');
   testBtn.addEventListener('click', function () {
     testResults.innerHTML = '';
-    var allPass = true;
+    var passCount = 0;
+    var cards = [];
     PRESETS.forEach(function (p, i) {
       var problems = checkPreset(p);
       var actual = decide(p.input);
       var spec = p.expectedSummary;
-      var row = el('div', 'sim-test-row ' + (problems.length ? 'fail' : 'pass'));
-      row.style.animationDelay = (i * 0.06).toFixed(2) + 's';
-      row.appendChild(el('span', 'sim-test-mark', problems.length ? '✗ FAIL' : '✓ PASS'));
-      row.appendChild(el('span', 'sim-test-name', p.name));
-      row.appendChild(el('span', 'sim-test-cmp',
+      if (!problems.length) passCount++;
+      var card = el('div', 'sim-test-card' + (problems.length ? ' fail' : ''));
+      card.style.animationDelay = (0.15 + i * 0.07).toFixed(2) + 's';
+      var head = el('div', 'sim-test-card-head');
+      head.appendChild(el('span', 'sim-test-mark', problems.length ? '✗ FAIL' : '✓ PASS'));
+      head.appendChild(el('span', 'sim-test-name', p.name));
+      card.appendChild(head);
+      card.appendChild(el('span', 'sim-test-cmp',
         'expected ' + spec.mode + ' / ' + spec.primaryBranch + ' · engine returned ' + actual.mode + ' / ' + actual.primaryBranch));
       if (problems.length) {
-        allPass = false;
         var d = el('div', 'sim-test-detail');
         problems.forEach(function (pr) { d.appendChild(el('div', null, pr)); });
-        row.appendChild(d);
+        card.appendChild(d);
       }
-      testResults.appendChild(row);
+      cards.push(card);
     });
-    testResults.appendChild(el('p', 'sim-test-sum ' + (allPass ? 'pass' : 'fail'),
-      allPass ? 'All ' + PRESETS.length + ' scenarios produce their expected structured output.' : 'At least one scenario deviates from its stored expected output.'));
+
+    var allPass = passCount === PRESETS.length;
+    var sumbar = el('div', 'sim-test-sumbar' + (allPass ? '' : ' fail'));
+    var fill = el('span', 'sim-test-fill');
+    sumbar.appendChild(fill);
+    var sumtext = el('span', 'sim-test-sumtext');
+    sumtext.appendChild(el('b', 'sim-test-count', passCount + ' / ' + PRESETS.length));
+    sumtext.appendChild(document.createTextNode(allPass
+      ? ' scenarios match their stored expected output'
+      : ' scenarios match; at least one deviates from its stored expected output'));
+    sumbar.appendChild(sumtext);
+    testResults.appendChild(sumbar);
+
+    var grid = el('div', 'sim-test-grid');
+    cards.forEach(function (c) { grid.appendChild(c); });
+    testResults.appendChild(grid);
+
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        fill.style.width = ((passCount / PRESETS.length) * 100).toFixed(0) + '%';
+      });
+    });
   });
+  testPanel.appendChild(testsHead);
   testPanel.appendChild(testNote);
-  testPanel.appendChild(testHow);
-  testPanel.appendChild(testWhy);
+  testPanel.appendChild(testInfo);
   testPanel.appendChild(testBtn);
   testPanel.appendChild(testResults);
 
