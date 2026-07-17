@@ -36,13 +36,50 @@
     });
   }
 
-  /* ---------- scroll reveals (one-time) ---------- */
+  /* ---------- fireflies ---------- */
+  var ambient = document.querySelector('.ambient');
+  if (ambient && !reduced) {
+    for (var i = 0; i < 12; i++) {
+      var ff = document.createElement('span');
+      ff.className = 'ff';
+      var size = 2.5 + Math.random() * 3.5;
+      ff.style.width = size + 'px';
+      ff.style.height = size + 'px';
+      ff.style.left = (Math.random() * 100) + '%';
+      ff.style.setProperty('--o', (0.15 + Math.random() * 0.35).toFixed(2));
+      ff.style.setProperty('--sway', ((Math.random() - 0.5) * 120).toFixed(0) + 'px');
+      var dur = 16 + Math.random() * 18;
+      ff.style.animationDuration = dur.toFixed(1) + 's';
+      ff.style.animationDelay = (-Math.random() * dur).toFixed(1) + 's';
+      ambient.appendChild(ff);
+    }
+  }
+
+  /* ---------- scroll reveals (+ stat count-up) ---------- */
+  var countUp = function (el) {
+    var target = parseInt(el.textContent, 10);
+    if (isNaN(target)) return;
+    var start = null, dur = 900;
+    var step = function (ts) {
+      if (!start) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(eased * target);
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
   var revealed = document.querySelectorAll('.rv');
   if ('IntersectionObserver' in window && !reduced) {
     var ro = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (e.isIntersecting) {
           e.target.classList.add('in');
+          if (e.target.classList.contains('sg')) {
+            var n = e.target.querySelector('.n');
+            if (n) countUp(n);
+          }
           ro.unobserve(e.target);
         }
       });
@@ -50,6 +87,26 @@
     revealed.forEach(function (el) { ro.observe(el); });
   } else {
     revealed.forEach(function (el) { el.classList.add('in'); });
+  }
+
+  /* ---------- ghost number parallax ---------- */
+  var ghosts = Array.prototype.slice.call(document.querySelectorAll('.phase-ghost'));
+  if (ghosts.length && !reduced) {
+    var pTick = false;
+    var parallax = function () {
+      var vh = window.innerHeight;
+      ghosts.forEach(function (g) {
+        var r = g.getBoundingClientRect();
+        if (r.bottom < -200 || r.top > vh + 200) return;
+        var off = (r.top + r.height / 2 - vh / 2) * -0.07;
+        g.style.transform = 'translateY(' + off.toFixed(1) + 'px)';
+      });
+      pTick = false;
+    };
+    window.addEventListener('scroll', function () {
+      if (!pTick) { pTick = true; requestAnimationFrame(parallax); }
+    }, { passive: true });
+    parallax();
   }
 
   /* ---------- typewriter on the merchant quote ---------- */
