@@ -212,6 +212,13 @@ html:not(.js) .rv { opacity: 1; transform: none; }
 }
 .rail a { position: relative; }
 .rail a:hover::after, .rail a:focus-visible::after { opacity: 1; transform: translateY(-50%) translateX(0); }
+.rail a.rail-sim { margin-top: 12px; }
+.rail a.rail-sim::before {
+  width: 11px; height: 11px; border-radius: 3px; background: none;
+  border: 1.5px solid rgba(159, 232, 112, 0.6); transform: rotate(45deg);
+}
+.rail a.rail-sim:hover::before { background: rgba(159, 232, 112, 0.6); border-color: var(--lime); transform: rotate(45deg) scale(1.15); }
+.rail a.rail-sim.active::before { background: var(--lime); border-color: var(--lime); transform: rotate(45deg) scale(1.2); box-shadow: 0 0 14px rgba(159, 232, 112, 0.55); }
 @media (max-width: 900px) { .rail { display: none; } }
 
 /* ==================== Branch tree (phase 3) ==================== */
@@ -660,6 +667,28 @@ html.embed .wf-hero { min-height: auto; padding-top: 46px; }
 .ov-num { font-family: var(--mono); font-size: 0.66rem; font-weight: 700; color: var(--lime); letter-spacing: 0.2em; margin-top: 14px; }
 .ov-name { font-weight: 800; color: #fff; font-size: 1rem; margin-top: 2px; line-height: 1.25; }
 .ov-cap { color: var(--mist-dim); font-size: 0.74rem; margin-top: 3px; line-height: 1.4; }
+
+.ov-outcome {
+  margin-top: 28px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  border: 1px solid rgba(159, 232, 112, 0.3); border-radius: 14px;
+  padding: 15px 20px; text-decoration: none; color: var(--mist);
+  font-size: 0.92rem; line-height: 1.5;
+  background: rgba(159, 232, 112, 0.05);
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.4s var(--ease-out);
+}
+.ov-outcome:hover { border-color: var(--lime); background: rgba(159, 232, 112, 0.09); transform: translateY(-2px); }
+.ov-outcome:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
+.ov-outcome b { color: #fff; }
+.ov-outcome-ic { color: var(--lime); display: flex; flex-shrink: 0; }
+.ov-outcome-cta {
+  margin-left: auto; font-family: var(--mono); font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--lime); white-space: nowrap;
+}
+.ov-tag {
+  display: block; margin-top: 6px; font-family: var(--mono); font-size: 0.58rem;
+  font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--lime);
+}
+@media (max-width: 680px) { .ov-outcome-cta { margin-left: 0; } }
 
 /* ==================== Living diagrams ==================== */
 .mdot { opacity: 0; transform-box: fill-box; transform-origin: center; }

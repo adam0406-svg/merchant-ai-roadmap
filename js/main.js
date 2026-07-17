@@ -196,6 +196,8 @@
       });
     }, { rootMargin: '-40% 0px -55% 0px' });
     phases.forEach(function (p) { po.observe(p); });
+    var simSec = document.getElementById('simulator');
+    if (simSec) po.observe(simSec);
   }
 
   /* ---------- top progress line ---------- */

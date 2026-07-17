@@ -557,6 +557,8 @@
     'Logic tests of the decision table against the scripted scenarios above: the stress-testing discipline from phase 4 applied to this model.');
   var testHow = el('p', 'sim-tests-note',
     'How it works: each of the ' + PRESETS.length + ' scenarios stores its expected result (branch, mode, escalation trigger and the full structured output). This button feeds every scenario through the decision rules again, live in your browser, and compares what the engine returns with what is stored. A match is PASS; any drift, for example after a rule change, shows as FAIL with the exact difference.');
+  var testWhy = el('p', 'sim-tests-note',
+    'Why do they all pass? Because the expected outputs were written together with the rules: the model was built until every scripted scenario matched its expectation. The value is in the future, not today. Change any rule and the affected scenarios fail immediately, which is how a decision table stays trustworthy as it evolves.');
   var testResults = el('div', 'sim-test-results');
   testResults.setAttribute('aria-live', 'polite');
   testBtn.addEventListener('click', function () {
@@ -584,6 +586,7 @@
   });
   testPanel.appendChild(testNote);
   testPanel.appendChild(testHow);
+  testPanel.appendChild(testWhy);
   testPanel.appendChild(testBtn);
   testPanel.appendChild(testResults);
 
