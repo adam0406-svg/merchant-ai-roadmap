@@ -410,17 +410,59 @@
   if (!root) return;
   document.documentElement.classList.add('sim-js');
 
+  var SVG_OPEN = '<svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">';
+  function icon(paths, size) {
+    var s = SVG_OPEN.replace(/width="18" height="18"/, 'width="' + (size || 18) + '" height="' + (size || 18) + '"');
+    return s + paths + '</svg>';
+  }
+
+  var SCENARIO_ICONS = [
+    '<path d="M5 10a10 10 0 0 1 14 0"/><path d="M8 13.5a6 6 0 0 1 8 0"/><circle cx="12" cy="17.5" r="1.4" fill="currentColor" stroke="none"/><line x1="4" y1="4" x2="20" y2="20"/>',
+    '<rect x="3" y="6" width="18" height="13" rx="2"/><line x1="3" y1="10.5" x2="21" y2="10.5"/>',
+    '<path d="M7 18a4.5 4.5 0 1 1 .8-8.9A6 6 0 0 1 19.5 11 3.7 3.7 0 0 1 18 18H7z"/><line x1="12" y1="10.5" x2="12" y2="13.5"/><circle cx="12" cy="15.8" r="0.9" fill="currentColor" stroke="none"/>',
+    '<rect x="5.5" y="11" width="13" height="9" rx="2"/><path d="M9 11V8a3 3 0 0 1 6 0v3"/>',
+    '<rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>',
+    '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.8.3-.9 1-.9 1.7"/><circle cx="12" cy="16.5" r="0.9" fill="currentColor" stroke="none"/>',
+    '<circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 2.5-4.5 6-4.5s6 1.5 6 4.5"/><circle cx="17.5" cy="9" r="2.4"/><path d="M16.5 14.6c2.6.3 4.5 1.7 4.5 4.4"/>',
+    '<path d="M20 12a8 8 0 1 1-2.5-5.8"/><polyline points="17.5 2.5 17.5 6.5 13.5 6.5"/>',
+    '<rect x="5.5" y="11" width="13" height="9" rx="2"/><path d="M9 11V8a3 3 0 0 1 6 0v3"/><line x1="2" y1="21" x2="22" y2="3"/>',
+    '<ellipse cx="12" cy="5.5" rx="7" ry="2.5"/><path d="M5 5.5v13c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-13"/><path d="M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/>',
+    '<path d="M13 2 5 13h5l-1 9 8-11h-5z"/>'
+  ];
+  var CUSTOM_ICON = '<line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2" fill="#fff"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2" fill="#fff"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="7" cy="17" r="2" fill="#fff"/>';
+
+  var GROUP_ICONS = [
+    '<path d="M21 12a8 8 0 0 1-8 8H5l-2 2V12a9 9 0 0 1 9-9 8 8 0 0 1 9 9z"/>',
+    '<ellipse cx="12" cy="5.5" rx="7" ry="2.5"/><path d="M5 5.5v13c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-13"/><path d="M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/>',
+    '<path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><polyline points="9 12 11 14 15 10"/>',
+    '<path d="M20 12a8 8 0 1 1-2.5-5.8"/><polyline points="17.5 2.5 17.5 6.5 13.5 6.5"/>'
+  ];
+
+  var BADGE_GLYPH = { A: 'A', B: 'B', C: 'C', D: 'D', E: 'E', F: 'F', human: 'H', none: '✓' };
+  var MODE_TEXT = {
+    normal: 'normal operation',
+    degraded: 'degraded: signals unavailable',
+    suspected_incident: 'suspected incident',
+    broadcast: 'broadcast mode'
+  };
+
   var state = {};
   function setState(input) {
     state = {};
     for (var k in DEFAULT_INPUT) state[k] = input[k];
   }
-  setState(DEFAULT_INPUT);
+  setState(PRESETS[0].input);
 
   function el(tag, cls, text) {
     var e = document.createElement(tag);
     if (cls) e.className = cls;
     if (text !== undefined) e.textContent = text;
+    return e;
+  }
+  function elHtml(tag, cls, html) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    e.innerHTML = html;
     return e;
   }
 
@@ -431,48 +473,80 @@
     return String(v).replace(/_/g, ' ');
   }
 
-  /* presets bar */
-  var presetsBar = el('div', 'sim-presets');
-  var customBtn = null;
-  var activeBtn = null;
-  function markActive(btn) {
-    if (activeBtn) activeBtn.classList.remove('active');
-    activeBtn = btn;
-    if (btn) btn.classList.add('active');
+  /* ---------- how-to legend ---------- */
+  var legend = elHtml('div', 'sim-steps',
+    '<span class="sim-step"><b>1</b>Pick a scenario, or set the signals yourself</span>' +
+    '<span class="sim-step-arrow" aria-hidden="true">&#8594;</span>' +
+    '<span class="sim-step"><b>2</b>The 12 rules run in priority order</span>' +
+    '<span class="sim-step-arrow" aria-hidden="true">&#8594;</span>' +
+    '<span class="sim-step"><b>3</b>Read the branch, the trace and the permissions</span>');
+
+  /* ---------- scenario deck ---------- */
+  var deck = el('div', 'sim-deck');
+  var activeCard = null;
+  var customCard = null;
+  function markActive(card) {
+    if (activeCard) activeCard.classList.remove('active');
+    activeCard = card;
+    if (card) card.classList.add('active');
   }
-  PRESETS.forEach(function (p) {
-    var b = el('button', 'sim-preset', p.name);
+  PRESETS.forEach(function (p, i) {
+    var b = el('button', 'sim-card');
     b.type = 'button';
-    b.title = p.blurb;
+    b.appendChild(elHtml('span', 'sim-card-ic', icon(SCENARIO_ICONS[i])));
+    b.appendChild(el('span', 'sim-card-t', p.name));
+    b.appendChild(el('span', 'sim-card-c', p.blurb));
     b.addEventListener('click', function () {
       setState(p.input);
       markActive(b);
       renderToggles();
       renderOutput();
     });
-    presetsBar.appendChild(b);
+    deck.appendChild(b);
   });
-  customBtn = el('button', 'sim-preset', 'Build your own');
-  customBtn.type = 'button';
-  customBtn.addEventListener('click', function () {
+  customCard = el('button', 'sim-card sim-card-custom');
+  customCard.type = 'button';
+  customCard.appendChild(elHtml('span', 'sim-card-ic', icon(CUSTOM_ICON)));
+  customCard.appendChild(el('span', 'sim-card-t', 'Build your own'));
+  customCard.appendChild(el('span', 'sim-card-c', 'All 20 signals, free to set.'));
+  customCard.addEventListener('click', function () {
     setState(DEFAULT_INPUT);
-    markActive(customBtn);
+    markActive(customCard);
     renderToggles();
     renderOutput();
   });
-  presetsBar.appendChild(customBtn);
+  deck.appendChild(customCard);
 
-  /* toggles */
+  /* ---------- board: signals in, decision out ---------- */
+  var board = el('div', 'sim-board');
+  var signalsCol = el('div', 'sim-signals');
+  var signalsHead = elHtml('h4', 'sim-col-h', icon('<polyline points="4 5 12 12 4 19"/><line x1="13" y1="19" x2="20" y2="19"/>', 13) + 'Signals in <span class="sim-col-note">lime dot = differs from a healthy baseline</span>');
+  signalsCol.appendChild(signalsHead);
   var togglesWrap = el('div', 'sim-toggles');
+  signalsCol.appendChild(togglesWrap);
+
+  var decisionCol = el('div', 'sim-decision');
+  var decisionHead = elHtml('h4', 'sim-col-h', icon('<line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="12" x2="5" y2="6"/><line x1="12" y1="12" x2="12" y2="4"/><line x1="12" y1="12" x2="19" y2="6"/><polyline points="5 9 5 6 8 6"/><polyline points="10 6 12 4 14 6"/><polyline points="16 6 19 6 19 9"/>', 13) + 'Decision out');
+  decisionCol.appendChild(decisionHead);
+  var decisionCard = el('div', 'sim-decision-card');
+  decisionCol.appendChild(decisionCard);
+
+  board.appendChild(signalsCol);
+  board.appendChild(decisionCol);
+
   function renderToggles() {
     togglesWrap.innerHTML = '';
-    FIELD_GROUPS.forEach(function (group) {
+    FIELD_GROUPS.forEach(function (group, gi) {
       var g = el('div', 'sim-group');
-      g.appendChild(el('h4', 'sim-group-h', group.name));
+      g.appendChild(elHtml('h5', 'sim-group-h', icon(GROUP_ICONS[gi], 13) + group.name));
       group.fields.forEach(function (f) {
         var key = f[0], label = f[1], options = f[2];
-        var row = el('div', 'sim-row');
-        row.appendChild(el('span', 'sim-row-l', label));
+        var changed = state[key] !== DEFAULT_INPUT[key];
+        var row = el('div', 'sim-row' + (changed ? ' changed' : ''));
+        var l = el('span', 'sim-row-l');
+        l.appendChild(el('i', 'sim-row-dot'));
+        l.appendChild(document.createTextNode(label));
+        row.appendChild(l);
         var opts = el('div', 'sim-opts');
         opts.setAttribute('role', 'group');
         opts.setAttribute('aria-label', label);
@@ -481,8 +555,9 @@
           b.type = 'button';
           b.setAttribute('aria-pressed', state[key] === v ? 'true' : 'false');
           b.addEventListener('click', function () {
+            if (state[key] === v) return;
             state[key] = v;
-            markActive(customBtn);
+            markActive(customCard);
             renderToggles();
             renderOutput();
           });
@@ -495,63 +570,93 @@
     });
   }
 
-  /* output */
-  var outputWrap = el('div', 'sim-output');
-  outputWrap.setAttribute('aria-live', 'polite');
+  /* ---------- decision trace console ---------- */
+  var trace = el('div', 'console sim-console');
+  var traceBar = elHtml('div', 'console-bar',
+    '<span class="ps-tab">' + icon('<polyline points="4 5 12 12 4 19"/><line x1="13" y1="19" x2="20" y2="19"/>', 12) + 'Decision trace · rules fired in priority order</span>' +
+    '<span class="cstatus">deterministic · runs in your browser</span>');
+  var traceBody = el('div', 'console-body sim-trace-body');
+  traceBody.setAttribute('aria-live', 'polite');
+  trace.appendChild(traceBar);
+  trace.appendChild(traceBody);
+  var traceScan = el('span', 'scan');
+  traceScan.setAttribute('aria-hidden', 'true');
+  trace.appendChild(traceScan);
+
+  /* ---------- permissions ---------- */
+  var permsWrap = el('div', 'sim-perms');
+  var PERM_META = [
+    ['Autonomous', 'autonomous', '<circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9.5"/>'],
+    ['Confirm first', 'confirm-first', '<circle cx="12" cy="12" r="9"/><line x1="12" y1="7" x2="12" y2="12.5"/><circle cx="12" cy="15.8" r="0.9" fill="currentColor" stroke="none"/>'],
+    ['Never', 'never', '<circle cx="12" cy="12" r="9"/><line x1="8" y1="8" x2="16" y2="16"/><line x1="16" y1="8" x2="8" y2="16"/>']
+  ];
+
   function renderOutput() {
     var r = decide(state);
-    outputWrap.innerHTML = '';
 
-    var head = el('div', 'sim-out-head');
-    var modeTag = el('span', 'sim-mode sim-mode-' + r.mode, 'mode: ' + r.mode.replace(/_/g, ' '));
-    head.appendChild(modeTag);
-    head.appendChild(el('span', 'sim-branch', BRANCH_LABELS[r.primaryBranch]));
-    outputWrap.appendChild(head);
+    /* decision card */
+    decisionCard.innerHTML = '';
+    var top = el('div', 'sim-dc-top');
+    top.appendChild(el('span', 'sim-badge sim-badge-' + r.primaryBranch, BADGE_GLYPH[r.primaryBranch]));
+    var tt = el('div', 'sim-dc-title');
+    tt.appendChild(el('span', 'sim-dc-branch', BRANCH_LABELS[r.primaryBranch]));
+    var light = el('span', 'sim-light sim-light-' + r.mode);
+    light.appendChild(el('i', 'sim-light-dot'));
+    light.appendChild(document.createTextNode(MODE_TEXT[r.mode] || r.mode));
+    tt.appendChild(light);
+    top.appendChild(tt);
+    decisionCard.appendChild(top);
 
-    if (r.secondaryFindings.length) {
-      var sf = el('div', 'sim-block');
-      sf.appendChild(el('h4', 'sim-block-h', 'Secondary findings, carried in context'));
-      var ul = el('ul', 'sim-list');
-      r.secondaryFindings.forEach(function (s) { ul.appendChild(el('li', null, s)); });
-      sf.appendChild(ul);
-      outputWrap.appendChild(sf);
-    }
-
-    var fr = el('div', 'sim-block');
-    fr.appendChild(el('h4', 'sim-block-h', 'Fired rules, in priority order'));
-    var ol = el('ol', 'sim-trace');
-    r.firedRules.forEach(function (s) { ol.appendChild(el('li', null, s)); });
-    fr.appendChild(ol);
-    outputWrap.appendChild(fr);
-
-    var pm = el('div', 'sim-block sim-perms');
-    [['Autonomous', r.permissions.autonomous], ['Confirm first', r.permissions.confirmFirst], ['Never', r.permissions.never]].forEach(function (pair) {
-      var col = el('div', 'sim-perm-col');
-      col.appendChild(el('h4', 'sim-block-h sim-perm-' + pair[0].toLowerCase().replace(' ', '-'), pair[0]));
-      var pul = el('ul', 'sim-list');
-      if (!pair[1].length) pul.appendChild(el('li', 'sim-dim', 'nothing at this stage'));
-      pair[1].forEach(function (s) { pul.appendChild(el('li', null, s)); });
-      col.appendChild(pul);
-      pm.appendChild(col);
-    });
-    outputWrap.appendChild(pm);
-
-    var nv = el('div', 'sim-block');
-    nv.appendChild(el('h4', 'sim-block-h', 'The verification that closes the case'));
-    nv.appendChild(el('p', 'sim-verify', r.nextVerification));
-    outputWrap.appendChild(nv);
+    var nv = el('div', 'sim-dc-block');
+    nv.appendChild(elHtml('h5', 'sim-dc-h', icon('<circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9.5"/>', 12) + 'Closes the case when'));
+    nv.appendChild(el('p', 'sim-dc-p', r.nextVerification));
+    decisionCard.appendChild(nv);
 
     if (r.escalationTrigger) {
-      var et = el('div', 'sim-block');
-      et.appendChild(el('h4', 'sim-block-h', 'Escalation trigger'));
-      et.appendChild(el('p', 'sim-escalation', r.escalationTrigger.replace(/_/g, ' ')));
-      outputWrap.appendChild(et);
+      var et = el('div', 'sim-dc-block');
+      et.appendChild(elHtml('h5', 'sim-dc-h', icon('<path d="M12 3l9 16H3z"/><line x1="12" y1="10" x2="12" y2="14"/><circle cx="12" cy="16.6" r="0.9" fill="currentColor" stroke="none"/>', 12) + 'Escalation trigger'));
+      et.appendChild(el('p', 'sim-dc-p sim-dc-esc', r.escalationTrigger.replace(/_/g, ' ')));
+      decisionCard.appendChild(et);
     }
+
+    if (r.secondaryFindings.length) {
+      var sf = el('div', 'sim-dc-block');
+      sf.appendChild(elHtml('h5', 'sim-dc-h', icon('<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>', 12) + 'Carried in context'));
+      var ul = el('ul', 'sim-dc-list');
+      r.secondaryFindings.forEach(function (s) { ul.appendChild(el('li', null, s)); });
+      sf.appendChild(ul);
+      decisionCard.appendChild(sf);
+    }
+
+    decisionCard.classList.remove('boot');
+    void decisionCard.offsetWidth;
+    decisionCard.classList.add('boot');
+
+    /* trace console */
+    traceBody.innerHTML = '';
+    r.firedRules.forEach(function (s, i) {
+      var p = el('p', 'sim-trace-line', s);
+      p.style.animationDelay = (0.08 + i * 0.14).toFixed(2) + 's';
+      traceBody.appendChild(p);
+    });
+
+    /* permissions */
+    permsWrap.innerHTML = '';
+    PERM_META.forEach(function (meta) {
+      var key = meta[1] === 'autonomous' ? 'autonomous' : (meta[1] === 'confirm-first' ? 'confirmFirst' : 'never');
+      var col = el('div', 'sim-perm-col sim-perm-col-' + meta[1]);
+      col.appendChild(elHtml('h4', 'sim-block-h sim-perm-' + meta[1], icon(meta[2], 13) + meta[0]));
+      var pul = el('ul', 'sim-list');
+      if (!r.permissions[key].length) pul.appendChild(el('li', 'sim-dim', 'nothing at this stage'));
+      r.permissions[key].forEach(function (s) { pul.appendChild(el('li', null, s)); });
+      col.appendChild(pul);
+      permsWrap.appendChild(col);
+    });
   }
 
-  /* test panel */
+  /* ---------- test panel ---------- */
   var testPanel = el('div', 'sim-tests');
-  var testBtn = el('button', 'sim-run-tests', 'Run all scenario tests');
+  var testBtn = elHtml('button', 'sim-run-tests', icon('<polygon points="7 4.5 19.5 12 7 19.5"/>', 13) + 'Run all scenario tests');
   testBtn.type = 'button';
   var testNote = el('p', 'sim-tests-note',
     'Logic tests of the decision table against the scripted scenarios above: the stress-testing discipline from phase 4 applied to this model.');
@@ -564,12 +669,13 @@
   testBtn.addEventListener('click', function () {
     testResults.innerHTML = '';
     var allPass = true;
-    PRESETS.forEach(function (p) {
+    PRESETS.forEach(function (p, i) {
       var problems = checkPreset(p);
       var actual = decide(p.input);
       var spec = p.expectedSummary;
       var row = el('div', 'sim-test-row ' + (problems.length ? 'fail' : 'pass'));
-      row.appendChild(el('span', 'sim-test-mark', problems.length ? 'FAIL' : 'PASS'));
+      row.style.animationDelay = (i * 0.06).toFixed(2) + 's';
+      row.appendChild(el('span', 'sim-test-mark', problems.length ? '✗ FAIL' : '✓ PASS'));
       row.appendChild(el('span', 'sim-test-name', p.name));
       row.appendChild(el('span', 'sim-test-cmp',
         'expected ' + spec.mode + ' / ' + spec.primaryBranch + ' · engine returned ' + actual.mode + ' / ' + actual.primaryBranch));
@@ -590,14 +696,14 @@
   testPanel.appendChild(testBtn);
   testPanel.appendChild(testResults);
 
-  root.appendChild(presetsBar);
-  root.appendChild(togglesWrap);
-  root.appendChild(outputWrap);
+  root.appendChild(legend);
+  root.appendChild(deck);
+  root.appendChild(board);
+  root.appendChild(trace);
+  root.appendChild(permsWrap);
   root.appendChild(testPanel);
 
-  /* start on preset 1 */
-  setState(PRESETS[0].input);
-  markActive(presetsBar.firstChild);
+  markActive(deck.firstChild);
   renderToggles();
   renderOutput();
 })();
