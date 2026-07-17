@@ -1076,6 +1076,14 @@ html:not(.js) .dial-arc { stroke-dashoffset: 12; }
 .closing h2 .q { color: var(--lime); }
 .closing .sub { color: var(--mist); max-width: 560px; font-size: 1.05rem; line-height: 1.7; }
 
+/* about this project */
+.about { padding: clamp(50px, 8vh, 90px) 0; }
+.about-grid { display: flex; gap: clamp(24px, 5vw, 70px); justify-content: space-between; flex-wrap: wrap; }
+.about-text { color: var(--mist-dim); font-size: 0.9rem; line-height: 1.7; max-width: 560px; margin: 0; }
+.about-links { display: flex; flex-direction: column; gap: 8px; font-family: var(--mono); font-size: 0.78rem; }
+.about-links a { color: var(--mist); text-decoration: none; }
+.about-links a:hover { color: var(--lime); }
+
 .footer { border-top: 1px solid rgba(159, 232, 112, 0.1); padding: 40px 0 48px; }
 .footer-grid { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
 .footer .f1 { font-family: var(--mono); font-size: 0.82rem; color: #fff; font-weight: 700; }
