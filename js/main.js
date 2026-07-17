@@ -1,8 +1,10 @@
-// Progressive enhancement. Without JS every panel is open and all content visible.
+// Progressive enhancement. Without JS every phase opens natively via <details>
+// and all content is visible. The .js class is added only after all handlers
+// are bound, so a failed script can never hide content.
 (function () {
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- hero word cascade ---------- */
+  /* ---------- hero word cascade (one-time entrance) ---------- */
   var heroH1 = document.querySelector('.hero h1');
   if (heroH1 && !reduced) {
     heroH1.classList.remove('rv');
@@ -34,70 +36,13 @@
     });
   }
 
-  /* ---------- fireflies ---------- */
-  var ambient = document.querySelector('.ambient');
-  if (ambient && !reduced) {
-    for (var i = 0; i < 12; i++) {
-      var ff = document.createElement('span');
-      ff.className = 'ff';
-      var size = 2.5 + Math.random() * 3.5;
-      ff.style.width = size + 'px';
-      ff.style.height = size + 'px';
-      ff.style.left = (Math.random() * 100) + '%';
-      ff.style.setProperty('--o', (0.15 + Math.random() * 0.35).toFixed(2));
-      ff.style.setProperty('--sway', ((Math.random() - 0.5) * 120).toFixed(0) + 'px');
-      var dur = 16 + Math.random() * 18;
-      ff.style.animationDuration = dur.toFixed(1) + 's';
-      ff.style.animationDelay = (-Math.random() * dur).toFixed(1) + 's';
-      ambient.appendChild(ff);
-    }
-  }
-
-  /* ---------- cursor glow ---------- */
-  if (!reduced && window.matchMedia('(pointer: fine)').matches) {
-    var glow = document.createElement('div');
-    glow.id = 'cursor-glow';
-    document.body.appendChild(glow);
-    var gx = 0, gy = 0, gTick = false;
-    document.addEventListener('mousemove', function (e) {
-      gx = e.clientX; gy = e.clientY;
-      if (!gTick) {
-        gTick = true;
-        requestAnimationFrame(function () {
-          glow.style.transform = 'translate3d(' + gx + 'px,' + gy + 'px,0)';
-          glow.style.opacity = '1';
-          gTick = false;
-        });
-      }
-    }, { passive: true });
-    document.addEventListener('mouseleave', function () { glow.style.opacity = '0'; });
-  }
-
-  /* ---------- scroll reveals (+ stat count-up) ---------- */
-  var countUp = function (el) {
-    var target = parseInt(el.textContent, 10);
-    if (isNaN(target)) return;
-    var start = null, dur = 900;
-    var step = function (ts) {
-      if (!start) start = ts;
-      var p = Math.min((ts - start) / dur, 1);
-      var eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = Math.round(eased * target);
-      if (p < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  };
-
+  /* ---------- scroll reveals (one-time) ---------- */
   var revealed = document.querySelectorAll('.rv');
   if ('IntersectionObserver' in window && !reduced) {
     var ro = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
         if (e.isIntersecting) {
           e.target.classList.add('in');
-          if (e.target.classList.contains('sg')) {
-            var n = e.target.querySelector('.n');
-            if (n) countUp(n);
-          }
           ro.unobserve(e.target);
         }
       });
@@ -107,79 +52,14 @@
     revealed.forEach(function (el) { el.classList.add('in'); });
   }
 
-  /* ---------- ghost number parallax ---------- */
-  var ghosts = Array.prototype.slice.call(document.querySelectorAll('.phase-ghost'));
-  if (ghosts.length && !reduced) {
-    var pTick = false;
-    var parallax = function () {
-      var vh = window.innerHeight;
-      ghosts.forEach(function (g) {
-        var r = g.getBoundingClientRect();
-        if (r.bottom < -200 || r.top > vh + 200) return;
-        var off = (r.top + r.height / 2 - vh / 2) * -0.07;
-        g.style.transform = 'translateY(' + off.toFixed(1) + 'px)';
-      });
-      pTick = false;
-    };
-    window.addEventListener('scroll', function () {
-      if (!pTick) { pTick = true; requestAnimationFrame(parallax); }
-    }, { passive: true });
-    parallax();
-  }
-
-  /* ---------- phase expand / collapse ---------- */
+  /* ---------- phase deep links (details do the open/close natively) ---------- */
   var phases = Array.prototype.slice.call(document.querySelectorAll('.phase'));
-
-  function typewrite(el) {
-    var full = el.getAttribute('data-text') || el.textContent;
-    if (el._twTimer) { clearTimeout(el._twTimer); el._twTimer = null; }
-    if (reduced) { el.textContent = full; el.classList.remove('typing'); return; }
-    el.textContent = '';
-    el.classList.add('typing');
-    var i = 0;
-    var tick = function () {
-      i++;
-      el.textContent = full.slice(0, i);
-      if (i < full.length) {
-        el._twTimer = setTimeout(tick, 55 + Math.random() * 45);
-      } else {
-        el._twTimer = setTimeout(function () { el.classList.remove('typing'); }, 1600);
-      }
-    };
-    el._twTimer = setTimeout(tick, 650);
-  }
-
-  function resetTypewriters(phase) {
-    Array.prototype.slice.call(phase.querySelectorAll('.typewriter')).forEach(function (el) {
-      if (el._twTimer) { clearTimeout(el._twTimer); el._twTimer = null; }
-      el.classList.remove('typing');
-      el.textContent = el.getAttribute('data-text') || el.textContent;
-    });
-  }
-
-  function setPhase(phase, open) {
-    var btn = phase.querySelector('.phase-toggle');
-    phase.classList.toggle('open', open);
-    if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open) {
-      Array.prototype.slice.call(phase.querySelectorAll('.typewriter')).forEach(typewrite);
-    } else {
-      resetTypewriters(phase);
-    }
-  }
-
-  phases.forEach(function (phase) {
-    var btn = phase.querySelector('.phase-toggle');
-    if (!btn) return;
-    btn.addEventListener('click', function () {
-      setPhase(phase, !phase.classList.contains('open'));
-    });
-  });
 
   function openPhase(id, scroll) {
     var phase = document.getElementById(id);
     if (!phase || !phase.classList.contains('phase')) return false;
-    setPhase(phase, true);
+    var d = phase.querySelector('details.phase-details');
+    if (d) d.open = true;
     if (scroll) {
       requestAnimationFrame(function () {
         var y = phase.getBoundingClientRect().top + window.pageYOffset - 20;
@@ -228,59 +108,10 @@
     update();
   }
 
-  /* ---------- phase 3 blueprint ---------- */
-  Array.prototype.slice.call(document.querySelectorAll('.bp')).forEach(function (bp) {
-    var nodes = Array.prototype.slice.call(bp.querySelectorAll('[data-d]'));
-    var details = Array.prototype.slice.call(bp.querySelectorAll('.bp-detail'));
-    nodes.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var target = btn.getAttribute('data-d');
-        nodes.forEach(function (n) { n.classList.toggle('active', n === btn); });
-        details.forEach(function (d) { d.hidden = d.id !== target; });
-      });
-    });
-  });
-
-  /* ---------- hologram spec overlay ---------- */
-  var holo = document.querySelector('.holo');
-  if (holo) {
-    var hFrame = holo.querySelector('iframe');
-    var hClose = holo.querySelector('.holo-close');
-    var hLast = null;
-
-    var openHolo = function (e) {
-      e.preventDefault();
-      hLast = document.activeElement;
-      if (!hFrame.getAttribute('src')) hFrame.src = 'workflow.html?embed=1';
-      holo.hidden = false;
-      document.body.style.overflow = 'hidden';
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () { holo.classList.add('show'); });
-      });
-      hClose.focus();
-    };
-    var closeHolo = function () {
-      holo.classList.remove('show');
-      document.body.style.overflow = '';
-      setTimeout(function () { holo.hidden = true; }, 400);
-      if (hLast) hLast.focus();
-    };
-
-    Array.prototype.slice.call(document.querySelectorAll('.js-holo')).forEach(function (a) {
-      a.addEventListener('click', openHolo);
-    });
-    hClose.addEventListener('click', closeHolo);
-    holo.querySelector('.holo-backdrop').addEventListener('click', closeHolo);
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && !holo.hidden) closeHolo();
-    });
-  }
-
-  /* ---------- embedded (in-overlay) mode for the spec page ---------- */
-  if (location.search.indexOf('embed=1') !== -1) {
-    document.documentElement.classList.add('embed');
-  }
-
   /* ---------- deep link ---------- */
   if (location.hash) openPhase(location.hash.slice(1), true);
+
+  /* Enhancement class last: everything above is bound, so CSS may now
+     defer .rv visibility to the observer. */
+  document.documentElement.classList.add('js');
 })();

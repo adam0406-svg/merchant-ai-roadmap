@@ -17,7 +17,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
-<script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
 
@@ -144,7 +143,8 @@
     <section class="phase" id="phase-1">
       <div class="phase-ghost" aria-hidden="true">01</div>
       <div class="container">
-        <button class="phase-toggle" type="button" aria-expanded="false" aria-controls="panel-1">
+        <details class="phase-details" id="panel-1">
+        <summary class="phase-toggle">
           <span class="pt-label rv">Phase 01 · Discover</span>
           <span class="pt-row">
             <span>
@@ -156,9 +156,9 @@
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </span>
           </span>
-        </button>
+        </summary>
 
-        <div class="phase-panel" id="panel-1">
+        <div class="phase-panel">
           <div class="pp-clip">
             <div class="pp-paper">
               <div class="phase-head">
@@ -251,11 +251,11 @@
                   </span>
                 </div>
                 <div class="console-body"><p><b>AI clusters 10,000 transcripts</b> into themes overnight, quantifies volumes and surfaces outliers no human would find. <b>Humans hear</b> the frustration, the workarounds, and what merchants mean but don't say. Analysis is automated; judgment is not.</p></div>
-                <span class="scan" aria-hidden="true"></span>
               </div>
             </div>
           </div>
         </div>
+        </details>
       </div>
     </section>
 
@@ -263,7 +263,8 @@
     <section class="phase" id="phase-2">
       <div class="phase-ghost" aria-hidden="true">02</div>
       <div class="container">
-        <button class="phase-toggle" type="button" aria-expanded="false" aria-controls="panel-2">
+        <details class="phase-details" id="panel-2">
+        <summary class="phase-toggle">
           <span class="pt-label rv">Phase 02 · Define</span>
           <span class="pt-row">
             <span>
@@ -275,9 +276,9 @@
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </span>
           </span>
-        </button>
+        </summary>
 
-        <div class="phase-panel" id="panel-2">
+        <div class="phase-panel">
           <div class="pp-clip">
             <div class="pp-paper">
               <div class="phase-head">
@@ -348,11 +349,11 @@
                   </span>
                 </div>
                 <div class="console-body"><p><b>AI sizes the prize:</b> counts affected calls, estimates minutes lost per merchant, simulates conversations to pressure-test the framing. <b>Humans decide</b> what gets built and what "good" means. The success metric is a stakeholder decision, never a model output.</p></div>
-                <span class="scan" aria-hidden="true"></span>
               </div>
             </div>
           </div>
         </div>
+        </details>
       </div>
     </section>
 
@@ -360,7 +361,8 @@
     <section class="phase" id="phase-3">
       <div class="phase-ghost" aria-hidden="true">03</div>
       <div class="container">
-        <button class="phase-toggle" type="button" aria-expanded="false" aria-controls="panel-3">
+        <details class="phase-details" id="panel-3">
+        <summary class="phase-toggle">
           <span class="pt-label rv">Phase 03 · Design</span>
           <span class="pt-row">
             <span>
@@ -372,9 +374,9 @@
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </span>
           </span>
-        </button>
+        </summary>
 
-        <div class="phase-panel" id="panel-3">
+        <div class="phase-panel">
           <div class="pp-clip">
             <div class="pp-paper">
               <div class="phase-head">
@@ -501,7 +503,7 @@
                   <span class="dv-s">6 branches · 20 edge cases · 6 test layers · assumptions A1 to A8</span>
                 </div>
                 <div class="dv-actions">
-                  <a class="btn-spec js-holo" href="workflow.html">Unveil the spec sheet</a>
+                  <a class="btn-spec" href="workflow.html">Open the full workflow specification</a>
                   <a class="btn-ghost-green" href="Flatpay-Agentic-Workflow-Design-Adam-Barfod.pdf" download>Download as PDF</a>
                 </div>
               </div>
@@ -517,11 +519,11 @@
                   </span>
                 </div>
                 <div class="console-body"><p><b>The AI is the product here:</b> it listens, classifies, composes signals and speaks. But the control flow stays deterministic: <b>the model exercises judgment inside steps; rules decide between them.</b> Reliability comes from the design, not the model.</p></div>
-                <span class="scan" aria-hidden="true"></span>
               </div>
             </div>
           </div>
         </div>
+        </details>
       </div>
     </section>
 
@@ -529,7 +531,8 @@
     <section class="phase" id="phase-4">
       <div class="phase-ghost" aria-hidden="true">04</div>
       <div class="container">
-        <button class="phase-toggle" type="button" aria-expanded="false" aria-controls="panel-4">
+        <details class="phase-details" id="panel-4">
+        <summary class="phase-toggle">
           <span class="pt-label rv">Phase 04 · Validate</span>
           <span class="pt-row">
             <span>
@@ -541,9 +544,9 @@
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </span>
           </span>
-        </button>
+        </summary>
 
-        <div class="phase-panel" id="panel-4">
+        <div class="phase-panel">
           <div class="pp-clip">
             <div class="pp-paper">
               <div class="phase-head">
@@ -613,11 +616,11 @@
                   </span>
                 </div>
                 <div class="console-body"><p><b>AI generates the hostile test set:</b> synthetic difficult callers, accent and noise variants, thousands of replayed conversations scored automatically. <b>Humans set the bar</b> and make the launch call. The model is tested by machines and judged by people.</p></div>
-                <span class="scan" aria-hidden="true"></span>
               </div>
             </div>
           </div>
         </div>
+        </details>
       </div>
     </section>
 
@@ -625,7 +628,8 @@
     <section class="phase" id="phase-5">
       <div class="phase-ghost" aria-hidden="true">05</div>
       <div class="container">
-        <button class="phase-toggle" type="button" aria-expanded="false" aria-controls="panel-5">
+        <details class="phase-details" id="panel-5">
+        <summary class="phase-toggle">
           <span class="pt-label rv">Phase 05 · Launch &amp; scale</span>
           <span class="pt-row">
             <span>
@@ -637,9 +641,9 @@
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </span>
           </span>
-        </button>
+        </summary>
 
-        <div class="phase-panel" id="panel-5">
+        <div class="phase-panel">
           <div class="pp-clip">
             <div class="pp-paper">
               <div class="phase-head">
@@ -708,11 +712,11 @@
                   </span>
                 </div>
                 <div class="console-body"><p><b>AI drafts market variants</b> of scripts and self-serve content for expert review, and monitors rollout metrics in real time. <b>Humans own go-live:</b> each market's support lead signs off before their merchants hear a single AI call.</p></div>
-                <span class="scan" aria-hidden="true"></span>
               </div>
             </div>
           </div>
         </div>
+        </details>
       </div>
     </section>
 
@@ -720,7 +724,8 @@
     <section class="phase" id="phase-6">
       <div class="phase-ghost" aria-hidden="true">06</div>
       <div class="container">
-        <button class="phase-toggle" type="button" aria-expanded="false" aria-controls="panel-6">
+        <details class="phase-details" id="panel-6">
+        <summary class="phase-toggle">
           <span class="pt-label rv">Phase 06 · Improve</span>
           <span class="pt-row">
             <span>
@@ -732,9 +737,9 @@
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </span>
           </span>
-        </button>
+        </summary>
 
-        <div class="phase-panel" id="panel-6">
+        <div class="phase-panel">
           <div class="pp-clip">
             <div class="pp-paper">
               <div class="phase-head">
@@ -829,11 +834,11 @@
                   </span>
                 </div>
                 <div class="console-body"><p><b>AI classifies every failed call</b> and drafts the weekly review; <b>humans decide</b> what ships. The same discipline that started this journey ends it: AI for scale, judgment for decisions.</p></div>
-                <span class="scan" aria-hidden="true"></span>
               </div>
             </div>
           </div>
         </div>
+        </details>
       </div>
     </section>
 
@@ -932,6 +937,7 @@
           <div class="c">honest success metric</div>
         </div>
       </div>
+    </div>
     </section>
 
 </main>
@@ -951,26 +957,6 @@
     </div>
   </div>
 </footer>
-
-<div class="holo" hidden>
-  <div class="holo-backdrop"></div>
-  <span class="holo-flash" aria-hidden="true"></span>
-  <span class="holo-shock" aria-hidden="true"></span>
-  <span class="holo-beam" aria-hidden="true"></span>
-  <span class="holo-burst" aria-hidden="true"></span>
-  <div class="holo-frame" role="dialog" aria-modal="true" aria-label="The full workflow specification">
-    <div class="holo-bar">
-      <span class="holo-title">spec_sheet · advanced mode</span>
-      <a class="holo-newtab" href="workflow.html" target="_blank" rel="noopener">Open in its own tab</a>
-      <button class="holo-close" type="button" aria-label="Close">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
-      </button>
-    </div>
-    <iframe title="The full workflow specification"></iframe>
-    <span class="holo-lines" aria-hidden="true"></span>
-    <span class="holo-glow" aria-hidden="true"></span>
-  </div>
-</div>
 
 <script src="js/main.js"></script>
 </body>
