@@ -609,9 +609,9 @@ html.embed .wf-hero { min-height: auto; padding-top: 46px; }
 
 /* ==================== Journey at a glance ==================== */
 .overview { padding-top: 0; }
-.ov-track { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.ov-track { position: relative; display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
 .ov-line {
-  position: absolute; top: 27px; left: calc(100% / 12); right: calc(100% / 12); height: 2px;
+  position: absolute; top: 27px; left: calc(100% / 14); right: calc(100% / 14); height: 2px;
   background-image: repeating-linear-gradient(90deg, rgba(159, 232, 112, 0.32) 0 7px, transparent 7px 17px);
   animation: ovdash 3.2s linear infinite;
 }
@@ -664,31 +664,15 @@ html.embed .wf-hero { min-height: auto; padding-top: 46px; }
   background: var(--lime); color: var(--green); border-color: var(--lime); transform: translateY(-5px);
 }
 .ov-node:focus-visible { outline: 2px solid var(--lime); outline-offset: 4px; border-radius: 10px; }
+.ov-node:nth-of-type(7) .ov-dot { animation-delay: 6.6s; }
+.ov-node.ov-run .ov-dot {
+  border-color: rgba(159, 232, 112, 0.75);
+  box-shadow: 0 0 16px rgba(159, 232, 112, 0.16);
+}
+.ov-node.ov-run .ov-num { letter-spacing: 0.3em; }
 .ov-num { font-family: var(--mono); font-size: 0.66rem; font-weight: 700; color: var(--lime); letter-spacing: 0.2em; margin-top: 14px; }
 .ov-name { font-weight: 800; color: #fff; font-size: 1rem; margin-top: 2px; line-height: 1.25; }
 .ov-cap { color: var(--mist-dim); font-size: 0.74rem; margin-top: 3px; line-height: 1.4; }
-
-.ov-outcome {
-  margin-top: 28px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-  border: 1px solid rgba(159, 232, 112, 0.3); border-radius: 14px;
-  padding: 15px 20px; text-decoration: none; color: var(--mist);
-  font-size: 0.92rem; line-height: 1.5;
-  background: rgba(159, 232, 112, 0.05);
-  transition: border-color 0.3s ease, background 0.3s ease, transform 0.4s var(--ease-out);
-}
-.ov-outcome:hover { border-color: var(--lime); background: rgba(159, 232, 112, 0.09); transform: translateY(-2px); }
-.ov-outcome:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
-.ov-outcome b { color: #fff; }
-.ov-outcome-ic { color: var(--lime); display: flex; flex-shrink: 0; }
-.ov-outcome-cta {
-  margin-left: auto; font-family: var(--mono); font-size: 0.7rem; font-weight: 700;
-  letter-spacing: 0.18em; text-transform: uppercase; color: var(--lime); white-space: nowrap;
-}
-.ov-tag {
-  display: block; margin-top: 6px; font-family: var(--mono); font-size: 0.58rem;
-  font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--lime);
-}
-@media (max-width: 680px) { .ov-outcome-cta { margin-left: 0; } }
 
 /* ==================== Living diagrams ==================== */
 .mdot { opacity: 0; transform-box: fill-box; transform-origin: center; }
