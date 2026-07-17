@@ -52,8 +52,46 @@
     revealed.forEach(function (el) { el.classList.add('in'); });
   }
 
+  /* ---------- typewriter on the merchant quote ---------- */
+  function typewrite(el) {
+    var full = el.getAttribute('data-text') || el.textContent;
+    if (el._twTimer) { clearTimeout(el._twTimer); el._twTimer = null; }
+    if (reduced) { el.textContent = full; el.classList.remove('typing'); return; }
+    el.textContent = '';
+    el.classList.add('typing');
+    var i = 0;
+    var tick = function () {
+      i++;
+      el.textContent = full.slice(0, i);
+      if (i < full.length) {
+        el._twTimer = setTimeout(tick, 55 + Math.random() * 45);
+      } else {
+        el._twTimer = setTimeout(function () { el.classList.remove('typing'); }, 1600);
+      }
+    };
+    el._twTimer = setTimeout(tick, 650);
+  }
+
+  function resetTypewriters(scope) {
+    Array.prototype.slice.call(scope.querySelectorAll('.typewriter')).forEach(function (el) {
+      if (el._twTimer) { clearTimeout(el._twTimer); el._twTimer = null; }
+      el.classList.remove('typing');
+      el.textContent = el.getAttribute('data-text') || el.textContent;
+    });
+  }
+
   /* ---------- phase deep links (details do the open/close natively) ---------- */
   var phases = Array.prototype.slice.call(document.querySelectorAll('.phase'));
+
+  Array.prototype.slice.call(document.querySelectorAll('details.phase-details')).forEach(function (d) {
+    d.addEventListener('toggle', function () {
+      if (d.open) {
+        Array.prototype.slice.call(d.querySelectorAll('.typewriter')).forEach(typewrite);
+      } else {
+        resetTypewriters(d);
+      }
+    });
+  });
 
   function openPhase(id, scroll) {
     var phase = document.getElementById(id);
@@ -106,6 +144,57 @@
       if (!ticking) { requestAnimationFrame(update); ticking = true; }
     }, { passive: true });
     update();
+  }
+
+  /* ---------- hologram spec overlay ---------- */
+  var holo = document.querySelector('.holo');
+  if (holo) {
+    var hFrame = holo.querySelector('iframe');
+    var hClose = holo.querySelector('.holo-close');
+    var hNewtab = holo.querySelector('.holo-newtab');
+    var hLast = null;
+
+    var openHolo = function (e) {
+      e.preventDefault();
+      hLast = document.activeElement;
+      if (!hFrame.getAttribute('src')) hFrame.src = 'workflow.html?embed=1';
+      holo.hidden = false;
+      document.body.style.overflow = 'hidden';
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { holo.classList.add('show'); });
+      });
+      hClose.focus();
+    };
+    var closeHolo = function () {
+      holo.classList.remove('show');
+      document.body.style.overflow = '';
+      setTimeout(function () { holo.hidden = true; }, 400);
+      if (hLast) hLast.focus();
+    };
+
+    Array.prototype.slice.call(document.querySelectorAll('.js-holo')).forEach(function (a) {
+      a.addEventListener('click', openHolo);
+    });
+    hClose.addEventListener('click', closeHolo);
+    holo.querySelector('.holo-backdrop').addEventListener('click', closeHolo);
+    document.addEventListener('keydown', function (e) {
+      if (holo.hidden) return;
+      if (e.key === 'Escape') { closeHolo(); return; }
+      /* focus trap: cycle between the bar controls and the iframe */
+      if (e.key === 'Tab') {
+        var focusables = [hNewtab, hClose, hFrame];
+        var idx = focusables.indexOf(document.activeElement);
+        if (idx === -1) { hClose.focus(); e.preventDefault(); return; }
+        var next = idx + (e.shiftKey ? -1 : 1);
+        if (next < 0) { focusables[focusables.length - 1].focus(); e.preventDefault(); }
+        else if (next >= focusables.length) { focusables[0].focus(); e.preventDefault(); }
+      }
+    });
+  }
+
+  /* ---------- embedded (in-overlay) mode for the spec page ---------- */
+  if (location.search.indexOf('embed=1') !== -1) {
+    document.documentElement.classList.add('embed');
   }
 
   /* ---------- deep link ---------- */
