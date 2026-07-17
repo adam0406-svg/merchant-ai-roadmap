@@ -154,7 +154,7 @@
     <table>
       <tr><th style="width:32%">Edge case</th><th>Designed behavior</th></tr>
       <tr><td>Noisy shop floor, music, espresso machine</td><td>ASR tuned and tested against in-domain noise; if transcription confidence drops, switch to short confirm-back questions rather than guessing.</td></tr>
-      <tr><td>Merchant interrupts mid-sentence (barge-in)</td><td>Stop speaking within ~200 ms, address the interruption, retain context. Tested explicitly, per branch.</td></tr>
+      <tr><td>Merchant interrupts mid-sentence (barge-in)</td><td>Stop speaking within ~200 ms (a provisional target, to be re-baselined on Flatpay's own audio), address the interruption, retain context. Tested explicitly, per branch.</td></tr>
       <tr><td>Accents, second-language speakers, code-switching (a Danish merchant switching to English)</td><td>Language detection per utterance; respond in the merchant's dominant language; never silently switch.</td></tr>
       <tr><td>Merchant puts the phone down to walk to the terminal; long silences</td><td>Distinguish "working silence" from "gone": announce wait expectations, re-prompt gently at intervals, offer a callback if the line stays dead.</td></tr>
       <tr><td>Caller says "the system" but means the POS tablet, the printer, or the cash drawer</td><td>Device disambiguation early in branch F, driven by the product registry: "Is it the card terminal itself, or the screen you run orders on?"</td></tr>
@@ -169,7 +169,7 @@
       <tr><th style="width:32%">Edge case</th><th>Designed behavior</th></tr>
       <tr><td>Conflicting signals: telemetry says online, merchant says dead</td><td>Trust neither alone. Run a terminal-to-host connection test or have the merchant attempt a payment; if it fails, treat telemetry as stale and follow the merchant's reality.</td></tr>
       <tr><td>Merchant has already rebooted ("I tried that")</td><td>Believe them. Skip the step, say why the next step differs. Repeating known-failed steps destroys credibility.</td></tr>
-      <tr><td>Two problems at once (offline <i>and</i> account hold)</td><td>Fix the blocking one for revenue first (connectivity), then surface the second before closing. Never close on a half-fixed account.</td></tr>
+      <tr><td>Two problems at once (offline <i>and</i> account hold)</td><td>Identify all active blockers. Resolve or escalate the blocker that currently determines payment availability, and carry secondary faults in the case context. An account-level restriction can block payments even with a healthy terminal.</td></tr>
       <tr><td>Intermittent fault ("it works sometimes")</td><td>Do not force a binary diagnosis. Log a pattern-watch on telemetry, set expectations, schedule follow-up rather than a fake fix.</td></tr>
       <tr><td>Symptom described in retrospect ("it didn't work this morning")</td><td>Check the transaction log for the time window instead of live troubleshooting a device that now works.</td></tr>
       <tr><td>Classification confidence low twice in a row</td><td>Stop looping. Two clarification attempts maximum, then warm handoff. The merchant's patience is the budget.</td></tr>
@@ -241,7 +241,7 @@
       <tr><td><b>1 · Branch logic</b></td><td>Decision-table tests: every branch, every permission gate, every edge case in section 5 as an executable test case.</td><td>100% of defined cases route correctly; no undefined states.</td></tr>
       <tr><td><b>2 · Transcript replay</b></td><td>Replay historical tickets and call transcripts through classification; compare to known root causes.</td><td>Classification agreement with resolved history of at least 90%, a provisional bar to be reset from the first replay baseline, before pilot.</td></tr>
       <tr><td><b>3 · Adversarial personas</b></td><td>Scripted difficult callers: furious, rambling, wrong-device, already-tried-everything, non-native speaker, silent.</td><td>No loop past two cycles; graceful handoff in every failed run.</td></tr>
-      <tr><td><b>4 · Voice reliability</b></td><td>ASR word-error rate on clean and in-domain noisy audio; barge-in stop latency and context retention; end-to-end latency.</td><td>WER under 5% clean, under 10% on tuned in-domain noisy audio; barge-in stop within 200 ms with context retained; latency under ~800 ms (published voice-QA baselines; re-baseline on Flatpay audio).</td></tr>
+      <tr><td><b>4 · Voice reliability</b></td><td>ASR word-error rate on clean and in-domain noisy audio; barge-in stop latency and context retention; end-to-end latency.</td><td>WER under 5% clean, under 10% on tuned in-domain noisy audio; barge-in stop within 200 ms with context retained; latency under ~800 ms. All provisional targets from published voice-QA baselines, to be re-baselined on Flatpay's own audio.</td></tr>
       <tr><td><b>5 · Shadow mode</b></td><td>AI listens to live calls and proposes diagnosis and next step; humans act. Measure agreement between AI proposal and human action.</td><td>Sustained agreement threshold met before any autonomous rollout.</td></tr>
       <tr><td><b>6 · Staged rollout</b></td><td>One market, lowest-risk branches first (B, E). Branch D never launches autonomous.</td><td>Metrics in section 9 hold for two review cycles before expansion.</td></tr>
     </table>
@@ -251,7 +251,7 @@
   <p><b>Containment is not resolution.</b> An AI that "handled the call" while the merchant still cannot take payments has failed twice: it failed the merchant, and it hid the failure from the team. This workflow has an unusual advantage: resolution is objectively verifiable.</p>
   <div class="why-box">
     <span class="lbl">Ground-truth metric · verified resolution</span>
-    <p>For hardware and connectivity fixes (branches B, C): the terminal processes a live transaction within 15 minutes of call end, observed in telemetry; the window is tuned from transaction-gap data per merchant type. Not "the caller didn't escalate." Not a survey. A payment. The other branches get their own success definitions: incident communicated and callback kept (A), case with the right specialist inside the SLA (D), merchant confirms understanding (E).</p>
+    <p>For hardware and connectivity fixes (branches B, C): the terminal processes a live transaction within 15 minutes of call end, observed in telemetry; the window is a provisional target, to be re-baselined on Flatpay's transaction-gap data per merchant type. Not "the caller didn't escalate." Not a survey. A payment. The other branches get their own success definitions: incident communicated and callback kept (A), case with the right specialist inside the SLA (D), merchant confirms understanding (E).</p>
   </div>
   <div class="table-scroll">
     <table>
