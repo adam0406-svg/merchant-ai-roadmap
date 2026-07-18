@@ -47,19 +47,45 @@
   </div>
 
   <h2 class="glance">The specification at a glance</h2>
-  <nav class="pipeline" aria-label="Specification sections">
-    <a href="#s1"><b>1</b>Frame</a>
-    <a href="#s2"><b>2</b>Signals</a>
-    <a href="#s3"><b>3</b>Flow</a>
-    <a href="#s4"><b>4</b>Permissions</a>
-    <a href="#s5"><b>5</b>Edge cases</a>
-    <a href="#s6"><b>6</b>Handoff</a>
-    <a href="#s7"><b>7</b>Localization</a>
-    <a href="#s8"><b>8</b>Testing</a>
-    <a href="#s9"><b>9</b>Metrics</a>
-    <a href="#snext"><b>+</b>Next</a>
-    <a href="#s10"><b>10</b>Assumptions</a>
-    <a href="#s11"><b>11</b>Principles</a>
+  <nav class="toc" aria-label="Table of contents">
+    <span class="toc-label" aria-hidden="true">index · 11 sections</span>
+    <ol class="toc-list">
+      <li><a href="#s1"><span class="toc-num">01</span><span class="toc-t">Problem framing</span></a></li>
+      <li><a href="#s2"><span class="toc-num">02</span><span class="toc-t">Signal map: check before you ask</span></a></li>
+      <li>
+        <a href="#s3"><span class="toc-num">03</span><span class="toc-t">The workflow</span></a>
+        <ol class="toc-sub">
+          <li><a href="#s3-branches">Six diagnosis branches</a></li>
+          <li><a href="#s3-path">The canonical decision path</a></li>
+        </ol>
+      </li>
+      <li>
+        <a href="#s4"><span class="toc-num">04</span><span class="toc-t">What the AI may do: permissions</span></a>
+        <ol class="toc-sub">
+          <li><a href="#s4-compliance">Compliance guardrails</a></li>
+        </ol>
+      </li>
+      <li>
+        <a href="#s5"><span class="toc-num">05</span><span class="toc-t">Edge cases</span></a>
+        <ol class="toc-sub">
+          <li><a href="#s5-voice">Voice channel</a></li>
+          <li><a href="#s5-diagnosis">Diagnosis</a></li>
+          <li><a href="#s5-action">Action &amp; trust</a></li>
+        </ol>
+      </li>
+      <li><a href="#s6"><span class="toc-num">06</span><span class="toc-t">Escalation and handoff</span></a></li>
+      <li><a href="#s7"><span class="toc-num">07</span><span class="toc-t">Localization: six market overlays</span></a></li>
+      <li><a href="#s8"><span class="toc-num">08</span><span class="toc-t">Stress-testing before go-live</span></a></li>
+      <li><a href="#s9"><span class="toc-num">09</span><span class="toc-t">Measuring what matters</span></a></li>
+      <li class="toc-plus"><a href="#snext"><span class="toc-num">+</span><span class="toc-t">What I would build next, inside Flatpay</span></a></li>
+      <li><a href="#s10"><span class="toc-num">10</span><span class="toc-t">Assumptions and validation paths</span></a></li>
+      <li>
+        <a href="#s11"><span class="toc-num">11</span><span class="toc-t">Design principles</span></a>
+        <ol class="toc-sub">
+          <li><a href="#s11-refs">Standards and practice</a></li>
+        </ol>
+      </li>
+    </ol>
   </nav>
   <div class="stats-paper">
     <div class="stat"><div class="n">6</div><div class="c">diagnosis branches</div></div>
@@ -117,7 +143,7 @@
     <div class="arrow">&#9660;</div>
     <div class="stage hl"><b>3 · Route to a diagnosis branch</b><span>LLM classifies the symptom; deterministic rules pick the branch. If confidence is low: one clarifying question, max two loops, then human.</span></div>
     <div class="arrow">&#9660;</div>
-    <div class="branches">
+    <div class="branches" id="s3-branches">
       <div class="branch"><span class="bl">A</span><b class="t">Platform incident</b><br>Tell the merchant it is not their fault, give status and expected resolution, log for callback. Suppress troubleshooting.</div>
       <div class="branch"><span class="bl">B</span><b class="t">Local connectivity</b><br>Guided recovery: network check, reboot, SIM or Wi-Fi failover where the hardware supports it. Verify each step against telemetry, not just "did that work?"</div>
       <div class="branch"><span class="bl">C</span><b class="t">Device fault / software</b><br>Remote checks, push update if safe (confirm first). If hardware is dead: replacement flow with clear timeline.</div>
@@ -131,7 +157,7 @@
     <div class="stage"><b>5 · Close, or hand off warm</b><span>Close: verified success, summary spoken and logged, ticket written. Hand off: warm transfer with the full context package (see Escalation and handoff) so the merchant never repeats themselves.</span></div>
   </div>
 
-  <h3>The canonical decision path, end to end</h3>
+  <h3 id="s3-path">The canonical decision path, end to end</h3>
   <p>The flowchart answers <b>"where did the case travel"</b>; the executable decision model's rule trace answers <b>"why"</b>. How to read it: rounded boxes are process steps, diamonds are decisions, cut-corner boxes are hard gates that outrank diagnosis, and slanted boxes are warm handoffs. Chips at the right are diagnosis branches reached directly from a gate; the dashed readouts are state changes, not routes. Terminology matches the decision model exactly, and a full text version follows below.</p>
   <div class="console fc-console">
     <div class="console-bar">
@@ -339,7 +365,7 @@
       <tr><td><span class="tag never">Never</span></td><td>Discuss the reasons behind a risk or KYC hold; change payout accounts or financial settings; quote settlement amounts without verified data; promise refunds, credits or waivers; keep a merchant in troubleshooting after two failed fix cycles.</td></tr>
     </table>
   </div>
-  <div class="why-box">
+  <div class="why-box" id="s4-compliance">
     <span class="lbl">Compliance guardrails · non-negotiable in all six markets</span>
     <p>The assistant identifies itself as AI at the start of every call, as a trust principle and in preparation for the EU AI Act transparency obligation applying from 2 August 2026. Call recording and transcript use rest on a documented lawful basis with clear notice, purpose limitation, data minimization, access controls, retention rules and data-subject rights, with legal review per market. Transcripts used for testing are redacted and de-identified; material that remains reasonably linkable to a person continues to be treated as personal data. The assistant never requests card data; recording is paused, suppressed or prevented from capturing it where possible, and accidental capture is immediately redacted under applicable PCI controls. These are design constraints, not features: any workflow change is checked against them before release.</p>
   </div>
@@ -347,7 +373,7 @@
   <h2 id="s5"><span class="secnum">5</span>Edge cases: where this workflow will misbehave</h2>
   <p>Edge cases are grouped by where they break the flow. Each one becomes a permanent test case in the stress-testing suite: found once, tested forever.</p>
 
-  <h3>Voice channel</h3>
+  <h3 id="s5-voice">Voice channel</h3>
   <div class="table-scroll">
     <table>
       <caption class="vh">Voice-channel edge cases and designed behavior</caption>
@@ -362,7 +388,7 @@
     </table>
   </div>
 
-  <h3>Diagnosis</h3>
+  <h3 id="s5-diagnosis">Diagnosis</h3>
   <div class="table-scroll">
     <table>
       <caption class="vh">Diagnosis edge cases and designed behavior</caption>
@@ -376,7 +402,7 @@
     </table>
   </div>
 
-  <h3>Action &amp; trust</h3>
+  <h3 id="s5-action">Action &amp; trust</h3>
   <div class="table-scroll">
     <table>
       <caption class="vh">Action and trust edge cases and designed behavior</caption>
@@ -501,7 +527,7 @@
     <div class="principle"><b>Every production failure becomes a permanent test.</b> The edge-case library only grows.</div>
   </div>
 
-  <h3>Standards and practice this design leans on</h3>
+  <h3 id="s11-refs">Standards and practice this design leans on</h3>
   <ul class="refs">
     <li><a href="https://www.anthropic.com/engineering/building-effective-agents" rel="noopener">Anthropic, Building Effective AI Agents</a>: the workflows-over-agents control flow at the core of section 3, with model judgment inside steps and deterministic rules between them.</li>
     <li><a href="https://artificialintelligenceact.eu/article/50/" rel="noopener">EU AI Act, Article 50</a>: disclosure that the caller is interacting with an AI, at the start of every call.</li>
