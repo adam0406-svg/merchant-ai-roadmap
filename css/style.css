@@ -1025,6 +1025,28 @@ html.sim-js .sim-nojs { display: none; }
 .sim-dc-list { margin: 0; padding-left: 16px; font-size: 0.8rem; color: var(--mist); line-height: 1.5; }
 .sim-dc-list li { margin-bottom: 4px; }
 
+/* decision status chip: the state of the case, labelled in text, never color alone */
+.sim-dc-statusrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.sim-statuschip {
+  display: inline-flex; align-items: center;
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  border-radius: 999px; padding: 5px 12px; border: 1.5px solid;
+}
+.sim-statuschip-routed { color: var(--lime); border-color: rgba(159, 232, 112, 0.6); background: rgba(159, 232, 112, 0.12); }
+.sim-statuschip-needs_clarification { color: #f0c66a; border-color: rgba(240, 198, 106, 0.6); background: rgba(240, 198, 106, 0.1); }
+.sim-statuschip-handoff { color: #9fd0f0; border-color: rgba(159, 208, 240, 0.6); background: rgba(159, 208, 240, 0.1); }
+.sim-statuschip-no_fault_confirmed { color: var(--mist); border-color: rgba(255, 255, 255, 0.35); background: rgba(255, 255, 255, 0.06); }
+.sim-dc-statusrow .sim-light { margin-top: 0; margin-left: auto; }
+.sim-badge-clarify {
+  background: rgba(240, 198, 106, 0.12); border-style: dashed;
+  border-color: rgba(240, 198, 106, 0.65); color: #f0c66a;
+}
+.sim-dc-prov {
+  display: block; margin-top: 5px;
+  font-family: var(--mono); font-size: 0.7rem; font-weight: 700; color: #f0c66a;
+}
+
 /* decision trace: rule nodes on a dashed trunk */
 .sim-tracepanel { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px 10px; margin-top: 14px; }
 .sim-tracelist { list-style: none; margin: 6px 0 0; padding: 0; position: relative; }
@@ -1052,9 +1074,10 @@ html.sim-js .sim-nojs { display: none; }
 .sim-trace-t { font-size: 0.84rem; color: #3f403e; line-height: 1.55; padding-top: 2px; }
 
 /* permissions */
-.sim-perms { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
+.sim-perms { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
 .sim-perm-col { background: var(--card); border: 1px solid var(--border); border-top: 4px solid var(--tag-auto); border-radius: 12px; padding: 12px 14px; }
 .sim-perm-col-confirm-first { border-top-color: var(--tag-confirm); }
+.sim-perm-col-locked { border-top-color: #b8863f; }
 .sim-perm-col-never { border-top-color: var(--tag-never); }
 .sim-block-h {
   display: flex; align-items: center; gap: 7px; margin: 0 0 6px;
@@ -1063,7 +1086,17 @@ html.sim-js .sim-nojs { display: none; }
 }
 .sim-perm-autonomous { color: var(--tag-auto); }
 .sim-perm-confirm-first { color: var(--tag-confirm); }
+.sim-perm-locked { color: #b8863f; }
 .sim-perm-never { color: var(--tag-never); }
+.sim-perm-note {
+  display: block; flex-basis: 100%; margin-top: 2px;
+  font-size: 0.56rem; font-weight: 400; letter-spacing: 0.08em; color: var(--muted);
+}
+.sim-block-h { flex-wrap: wrap; }
+.sim-vh {
+  position: absolute; width: 1px; height: 1px; margin: -1px;
+  padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
 .sim-list { margin: 0; padding-left: 18px; font-size: 0.82rem; line-height: 1.5; color: #3f403e; }
 .sim-list li { margin-bottom: 4px; }
 .sim-dim { color: var(--muted); font-style: italic; list-style: none; margin-left: -18px; }
@@ -1128,11 +1161,13 @@ html.sim-js .sim-nojs { display: none; }
 .sim-test-name { font-weight: 800; color: var(--green); font-size: 0.8rem; }
 .sim-test-cmp { font-family: var(--mono); font-size: 0.64rem; color: var(--muted); }
 .sim-test-detail { font-family: var(--mono); font-size: 0.7rem; color: var(--tag-never); margin-top: 3px; }
+.sim-test-snap { color: #b8863f; }
 
 @media (max-width: 1000px) {
   .sim-deck { grid-template-columns: repeat(3, 1fr); }
   .sim-board { grid-template-columns: 1fr; }
   .sim-decision { position: static; }
+  .sim-perms { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 680px) {
   .sim-deck { grid-template-columns: repeat(2, 1fr); }
