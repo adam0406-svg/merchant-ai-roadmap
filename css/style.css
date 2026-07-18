@@ -587,13 +587,6 @@ html.embed .wf-hero { min-height: auto; padding-top: 46px; }
 .btn.solid:hover { background: #b3f188; }
 .btn.ghost { border: 1px solid rgba(159, 232, 112, 0.35); color: var(--lime); }
 .btn.ghost:hover { border-color: var(--lime); }
-.hero-textlink {
-  font-family: var(--mono); font-size: 0.74rem; font-weight: 700;
-  color: var(--mist); text-decoration: underline; text-underline-offset: 4px;
-  transition: color 0.25s ease;
-}
-.hero-textlink:hover, .hero-textlink:focus-visible { color: var(--lime); }
-
 /* spec link block under the simulator */
 .sec.speclink { padding: clamp(48px, 7vh, 80px) 0; }
 .speclink-box {
@@ -689,12 +682,6 @@ html.embed .wf-hero { min-height: auto; padding-top: 46px; }
 .ov-num { font-family: var(--mono); font-size: 0.66rem; font-weight: 700; color: var(--lime); letter-spacing: 0.2em; margin-top: 14px; }
 .ov-name { font-weight: 800; color: #fff; font-size: 1rem; margin-top: 2px; line-height: 1.25; }
 .ov-cap { color: var(--mist-dim); font-size: 0.74rem; margin-top: 3px; line-height: 1.4; }
-.ov-tag {
-  margin-top: 7px;
-  font-family: var(--mono); font-size: 0.58rem; font-weight: 700;
-  letter-spacing: 0.12em; text-transform: uppercase; color: var(--lime);
-  border: 1px solid rgba(159, 232, 112, 0.35); border-radius: 999px; padding: 3px 9px;
-}
 
 /* ==================== Living diagrams ==================== */
 .mdot { opacity: 0; transform-box: fill-box; transform-origin: center; }
