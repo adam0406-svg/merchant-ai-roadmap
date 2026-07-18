@@ -6,8 +6,8 @@ Built as an independent application project for the Jr. AI Specialist (Voice AI)
 
 ## What's here
 
-- `index.html` - the six-phase method walkthrough (discover, define, design, validate, launch, improve), including an executable implementation of the decision model with 11 scripted scenarios and a logic-test panel
-- `workflow.html` - the full workflow specification: signal map, diagnosis branches, permission model, 20 edge cases, test plan, metrics, assumptions register
+- `index.html` - the executable decision model (14 scripted scenarios, independent logic tests plus a snapshot regression guard) and the six-phase method walkthrough behind it (discover, define, design, validate, launch, improve)
+- `workflow.html` - the full workflow specification: signal map, decision-path flowchart, diagnosis branches, permission model, 20 edge cases, test plan, metrics, assumptions register
 - `css/`, `js/` - vanilla CSS and JavaScript, no frameworks, no build step; `js/sim.js` is the decision engine (client-side only, no backend, no LLM calls)
 
 ## Run locally
