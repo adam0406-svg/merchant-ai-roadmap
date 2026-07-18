@@ -587,6 +587,47 @@ html.embed .wf-hero { min-height: auto; padding-top: 46px; }
 .btn.solid:hover { background: #b3f188; }
 .btn.ghost { border: 1px solid rgba(159, 232, 112, 0.35); color: var(--lime); }
 .btn.ghost:hover { border-color: var(--lime); }
+.hero-textlink {
+  font-family: var(--mono); font-size: 0.74rem; font-weight: 700;
+  color: var(--mist); text-decoration: underline; text-underline-offset: 4px;
+  transition: color 0.25s ease;
+}
+.hero-textlink:hover, .hero-textlink:focus-visible { color: var(--lime); }
+
+/* proof strip: what was built, how, its status, related work */
+.sec.proof { padding: clamp(40px, 6vh, 64px) 0; }
+.proof-strip {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+  border: 1px solid rgba(159, 232, 112, 0.16); border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.proof-cell { padding: 20px 22px; }
+.proof-cell + .proof-cell { border-left: 1px solid rgba(159, 232, 112, 0.12); }
+.proof-h {
+  display: block; margin-bottom: 8px;
+  font-family: var(--mono); font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--lime);
+}
+.proof-cell p { margin: 0; font-size: 0.82rem; line-height: 1.6; color: var(--mist); }
+@media (max-width: 900px) {
+  .proof-strip { grid-template-columns: repeat(2, 1fr); }
+  .proof-cell:nth-child(3) { border-left: none; }
+  .proof-cell:nth-child(n+3) { border-top: 1px solid rgba(159, 232, 112, 0.12); }
+}
+@media (max-width: 520px) {
+  .proof-strip { grid-template-columns: 1fr; }
+  .proof-cell + .proof-cell { border-left: none; border-top: 1px solid rgba(159, 232, 112, 0.12); }
+}
+
+/* spec link block under the simulator */
+.sec.speclink { padding: clamp(48px, 7vh, 80px) 0; }
+.speclink-box {
+  display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+  border: 1px solid rgba(159, 232, 112, 0.2); border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02); padding: 26px 30px;
+}
+.sl-t { display: block; font-weight: 800; font-size: 1.05rem; color: #fff; margin-bottom: 6px; }
+.sl-c { display: block; font-family: var(--mono); font-size: 0.68rem; color: var(--mist); letter-spacing: 0.04em; }
 .hero-note { font-family: var(--mono); font-size: 0.72rem; color: var(--mist-dim); }
 
 .scroll-cue {

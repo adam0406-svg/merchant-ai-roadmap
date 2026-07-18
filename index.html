@@ -34,18 +34,18 @@
   <a class="brand" href="#top">Adam Grøfte Barfod<span> · method journey</span></a>
   <div class="tb-right">
     <a class="tb-contact" href="mailto:adam0406@gmail.com">adam0406@gmail.com</a>
-    <a class="tb-pdf" href="workflow.html">Spec sheet</a>
+    <a class="tb-pdf" href="workflow.html">Workflow specification</a>
   </div>
 </header>
 
 <nav class="rail" aria-label="Phases">
+  <a class="rail-sim" href="#simulator" aria-label="Run the decision model" data-tip="Decision model · run the workflow live"></a>
   <a href="#phase-1" aria-label="Phase 1, Discover" data-tip="Phase 01 · Discover: find the real problems"></a>
   <a href="#phase-2" aria-label="Phase 2, Define" data-tip="Phase 02 · Define: pick the right one, and the right tool"></a>
   <a href="#phase-3" aria-label="Phase 3, Design" data-tip="Phase 03 · Design: the call that fixes it"></a>
   <a href="#phase-4" aria-label="Phase 4, Validate" data-tip="Phase 04 · Validate: prove it before anyone hears it"></a>
   <a href="#phase-5" aria-label="Phase 5, Launch and scale" data-tip="Phase 05 · Launch &amp; scale: earn autonomy step by step"></a>
   <a href="#phase-6" aria-label="Phase 6, Improve" data-tip="Phase 06 · Improve: launch is the beginning"></a>
-  <a class="rail-sim" href="#simulator" aria-label="Run the decision model" data-tip="Decision model · run the workflow live"></a>
 </nav>
 
 <main id="top">
@@ -53,16 +53,73 @@
   <!-- ============ HERO ============ -->
   <section class="hero">
     <div class="container">
-      <p class="kicker rv">A method walkthrough · six phases</p>
-      <h1 class="rv" style="--d:.1s">From merchant problem to working AI: <span class="q">how I would tackle it</span></h1>
-      <p class="sub rv" style="--d:.2s"><b>An AI that resolves merchant problems, not just hands them off.</b> This is how I would build it, with one running example from Flatpay's world: <b>"My terminal won't take payments."</b> Scroll through the journey, open any phase for the detail. Built without inside knowledge: every assumption is cheap to correct.</p>
+      <p class="kicker rv">Independent concept work · Flatpay's Voice AI ambition</p>
+      <h1 class="rv" style="--d:.1s">From Voice AI ambition to an executable decision model: <span class="q">how I would tackle it</span></h1>
+      <p class="sub rv" style="--d:.2s"><b>I translated Flatpay's Voice AI ambition into a validation-ready workflow and an executable decision model for one high-stakes merchant problem:</b> <b>"My terminal won't take payments."</b> Run the model in your browser, read the specification behind it, or walk the six-phase method that produced both. Built without inside knowledge: every assumption is marked and cheap to correct.</p>
       <div class="hero-actions rv" style="--d:.3s">
-        <a class="btn solid" href="#overview">Start the journey</a>
+        <a class="btn solid" href="#simulator">Run the decision model</a>
+        <a class="btn ghost js-holo" href="workflow.html">Read the full workflow specification</a>
+        <a class="hero-textlink" href="#overview">Explore the six-phase method</a>
       </div>
     </div>
     <div class="scroll-cue" aria-hidden="true">
       <span>Scroll</span>
       <span class="line"></span>
+    </div>
+  </section>
+
+  <!-- ============ PROOF STRIP ============ -->
+  <section class="sec proof" id="proof">
+    <div class="container">
+      <div class="proof-strip rv">
+        <div class="proof-cell">
+          <span class="proof-h">Built</span>
+          <p>Six-phase case study, complete workflow specification and executable decision model.</p>
+        </div>
+        <div class="proof-cell">
+          <span class="proof-h">Implementation</span>
+          <p>Semantic HTML, CSS and vanilla JavaScript, designed and implemented by Adam Grøfte Barfod with Claude Code.</p>
+        </div>
+        <div class="proof-cell">
+          <span class="proof-h">Status</span>
+          <p>Independent concept using illustrative data; not connected to Flatpay systems; assumptions explicitly marked.</p>
+        </div>
+        <div class="proof-cell">
+          <span class="proof-h">Related work</span>
+          <p>AI KYB prototype from an earlier Flatpay application, and custom AI agents designed and implemented for clients at Aety.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DECISION MODEL SIMULATOR ============ -->
+  <section class="sec" id="simulator">
+    <div class="container">
+      <p class="sec-label rv">Run the decision model</p>
+      <p class="sim-intro rv" style="--d:.05s">The deterministic core of the proposed workflow, running live: pick a scripted scenario or set the signals yourself, and follow the rules to a status and a route. Phase 3 of the journey below shows how this design was produced.</p>
+      <div class="sim-paper rv" style="--d:.1s">
+        <p class="sim-honesty">This is an executable implementation of the proposed decision model. The rules run as shown; the scenarios, system signals and branch logic remain hypotheses until validated against Flatpay's data and operating procedures. The conversational AI layer is out of scope: this demonstrates the workflow, not the voice agent.</p>
+        <p class="sim-refs">The model encodes the specification's control flow and follows its disclosure and compliance constraints; the standards and practice it leans on are <a href="workflow.html#s11">referenced in the specification</a>.</p>
+        <div class="sim-nojs card">
+          <div class="ct">The interactive decision model needs JavaScript</div>
+          <div class="cc">With scripts off you still have the full logic in writing: the decision table, branch playbooks and gates are specified in <a href="workflow.html">the full workflow specification</a>.</div>
+        </div>
+        <div id="sim-app"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ THE SPECIFICATION BEHIND THE MODEL ============ -->
+  <section class="sec speclink">
+    <div class="container">
+      <p class="sec-label rv">The specification behind the model</p>
+      <div class="speclink-box rv" style="--d:.1s">
+        <div class="speclink-main">
+          <span class="sl-t">Every rule the model just ran is specified in writing</span>
+          <span class="sl-c">6 diagnosis branches · 20 edge cases · 6 test layers · permission gates · assumptions A1 to A8</span>
+        </div>
+        <a class="btn ghost js-holo" href="workflow.html">Open the full workflow specification</a>
+      </div>
     </div>
   </section>
 
@@ -113,7 +170,7 @@
           <span class="ov-dot"><svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="7 4.5 19.5 12 7 19.5"/></svg></span>
           <span class="ov-num">RUN</span>
           <span class="ov-name">Decision model</span>
-          <span class="ov-cap">The journey's output, live in the browser</span>
+          <span class="ov-cap">The journey's output, live at the top of this page</span>
         </a>
       </div>
     </div>
@@ -198,7 +255,7 @@
                   </div>
                   <div class="tile">
                     <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#101210" stroke-width="1.8" stroke-linecap="round"><rect x="5.5" y="11" width="13" height="9" rx="2"/><path d="M9 11V8a3 3 0 0 1 6 0v3"/></svg>
-                    <div class="tt">Account hold</div><div class="tc">Risk, KYC or settlement</div>
+                    <div class="tt">Account-level restriction</div><div class="tc">A risk, KYC or settlement hold</div>
                   </div>
                   <div class="tile">
                     <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#101210" stroke-width="1.8" stroke-linecap="round"><path d="M7 18a4.5 4.5 0 1 1 .8-8.9A6 6 0 0 1 19.5 11 3.7 3.7 0 0 1 18 18H7z"/><line x1="12" y1="10.5" x2="12" y2="13.5"/><circle cx="12" cy="15.8" r="0.9" fill="#101210" stroke="none"/></svg>
@@ -342,7 +399,7 @@
                 </div>
                 <div>
                   <div class="ho-chip">The problem statement</div>
-                  <div class="dc" style="margin-top:0">One problem statement, one success metric, one scope: <b>help a verified merchant get from "it stopped working" to taking payments again, and prove it happened.</b> Everything out of scope is written down and parked, not forgotten.</div>
+                  <div class="dc" style="margin-top:0">One problem statement, one measurement principle, one scope: <b>help a verified merchant get from "it stopped working" to taking payments again, and prove it happened.</b> Everything out of scope is written down and parked, not forgotten.</div>
                 </div>
               </div>
 
@@ -462,7 +519,7 @@
                   <div class="bt-branch">
                     <span class="bt-badge">D</span>
                     <span class="bt-ic"><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#101210" stroke-width="1.8" stroke-linecap="round"><rect x="5.5" y="11" width="13" height="9" rx="2"/><path d="M9 11V8a3 3 0 0 1 6 0v3"/></svg></span>
-                    <div><span class="bt-t">Account hold</span><span class="bt-c">No speculation. Straight to a human specialist, warm</span></div>
+                    <div><span class="bt-t">Account-level restriction</span><span class="bt-c">No speculation. Straight to a human specialist, warm</span></div>
                   </div>
                   <div class="bt-branch">
                     <span class="bt-badge">E</span>
@@ -478,7 +535,7 @@
               </div>
 
               <h3 class="seclbl">The deliverable</h3>
-              <p class="bridge">Everything streams into this document: the discovery data, the problem statement, every decision above. The specification is forged from all of it: the flow, the AI's permissions, 20 edge cases, testing and localization: a concrete starting point for engineering discovery with the AI team, not a substitute for it.</p>
+              <p class="bridge">Everything streams into this document: the discovery data, the problem statement, every decision above. The specification is assembled from all of it: the flow, the AI's permissions, 20 edge cases, testing and localization: a concrete starting point for engineering discovery with the AI team, not a substitute for it.</p>
               <svg focusable="false" class="forge" viewBox="0 0 600 145" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
                 <path class="forge-path" d="M 20,0 C 20,100 300,60 300,112" fill="none" stroke="rgba(16,18,16,0.25)" stroke-width="1.6" stroke-dasharray="5 7"/>
                 <path class="forge-path" d="M 95,0 C 95,90 300,65 300,112" fill="none" stroke="rgba(16,18,16,0.25)" stroke-width="1.6" stroke-dasharray="5 7"/>
@@ -512,7 +569,7 @@
                   <span class="dv-s">6 branches · 20 edge cases · 6 test layers · assumptions A1 to A8</span>
                 </div>
                 <div class="dv-actions">
-                  <a class="btn-spec js-holo" href="workflow.html">Show the spec sheet</a>
+                  <a class="btn-spec js-holo" href="workflow.html">Open the full workflow specification</a>
                 </div>
               </div>
 
@@ -758,7 +815,7 @@
                 <div class="phase-quote">"Containment is not resolution."</div>
               </div>
 
-              <h3 class="seclbl">The metric that cannot lie</h3>
+              <h3 class="seclbl">One measurement principle, verified outcomes per branch</h3>
               <div class="dark-card dark-split">
                 <div class="dside">
                   <div class="dn">15<small> min</small></div>
@@ -856,23 +913,6 @@
 
   </div>
 
-  <!-- ============ DECISION MODEL SIMULATOR ============ -->
-  <section class="sec" id="simulator">
-    <div class="container">
-      <p class="sec-label rv">Run the decision model</p>
-      <p class="sim-intro rv" style="--d:.05s">The deterministic core of the phase 3 design, running live: pick a scripted scenario or set the signals yourself and follow the rules to a branch.</p>
-      <div class="sim-paper rv" style="--d:.1s">
-        <p class="sim-honesty">This is an executable implementation of the proposed decision model. The rules run as shown; the scenarios, system signals and branch logic remain hypotheses until validated against Flatpay's data and operating procedures. The conversational AI layer is out of scope: this demonstrates the workflow, not the voice agent.</p>
-        <p class="sim-refs">The model encodes the specification's control flow and follows its disclosure and compliance constraints; the standards and practice it leans on are <a href="workflow.html#s11">referenced in the specification</a>.</p>
-        <div class="sim-nojs card">
-          <div class="ct">The interactive decision model needs JavaScript</div>
-          <div class="cc">With scripts off you still have the full logic in writing: the decision table, branch playbooks and gates are specified in <a href="workflow.html">the workflow specification</a>.</div>
-        </div>
-        <div id="sim-app"></div>
-      </div>
-    </div>
-  </section>
-
   <!-- ============ THREE BELIEFS ============ -->
   <section class="sec">
     <div class="container">
@@ -963,7 +1003,7 @@
             </svg>
           </div>
           <div class="n">1</div>
-          <div class="c">honest success metric</div>
+          <div class="c">measurement principle, branch-specific verified outcomes</div>
         </div>
       </div>
     </div>
@@ -1011,7 +1051,7 @@
   <span class="holo-burst" aria-hidden="true"></span>
   <div class="holo-frame" role="dialog" aria-modal="true" aria-label="The full workflow specification">
     <div class="holo-bar">
-      <span class="holo-title">spec_sheet · advanced mode</span>
+      <span class="holo-title">workflow_specification · advanced mode</span>
       <a class="holo-newtab" href="workflow.html" target="_blank" rel="noopener">Open in its own tab</a>
       <button class="holo-close" type="button" aria-label="Close">
         <svg aria-hidden="true" focusable="false" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
