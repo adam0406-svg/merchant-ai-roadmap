@@ -57,6 +57,7 @@
     <a href="#s7"><b>7</b>Localization</a>
     <a href="#s8"><b>8</b>Testing</a>
     <a href="#s9"><b>9</b>Metrics</a>
+    <a href="#snext"><b>+</b>Next</a>
     <a href="#s10"><b>10</b>Assumptions</a>
     <a href="#s11"><b>11</b>Principles</a>
   </nav>
@@ -64,7 +65,7 @@
     <div class="stat"><div class="n">6</div><div class="c">diagnosis branches</div></div>
     <div class="stat"><div class="n">20</div><div class="c">edge cases designed for</div></div>
     <div class="stat"><div class="n">6</div><div class="c">test layers before go-live</div></div>
-    <div class="stat"><div class="n">1</div><div class="c">ground-truth success metric</div></div>
+    <div class="stat"><div class="n">1</div><div class="c">measurement principle, branch-specific verified outcomes</div></div>
   </div>
 
   <h2 id="s1"><span class="secnum">1</span>Problem framing</h2>
@@ -77,7 +78,7 @@
       <tr><td>"It won't take payments" / "It's dead" / "Nothing happens"</td><td>Local connectivity is down (Wi-Fi, SIM, router)</td><td>Terminal telemetry, network heartbeat</td></tr>
       <tr><td>"It keeps saying error" / "It rejects the card"</td><td>Card-side declines (issuer, not merchant)</td><td>Transaction log, decline codes</td></tr>
       <tr><td>"It froze" / "The screen is stuck"</td><td>Device fault or pending software update</td><td>Device status, firmware version</td></tr>
-      <tr><td>"Payments stopped working today"</td><td>Account-level hold (risk, KYC, settlement)</td><td>Account status systems</td></tr>
+      <tr><td>"Payments stopped working today"</td><td>Account-level restriction (a risk, KYC or settlement hold)</td><td>Account status systems</td></tr>
       <tr><td>"Everyone here has this problem"</td><td>Platform or processor incident</td><td>Incident status, call-volume spike</td></tr>
       <tr><td>"The system isn't working"</td><td>Different device entirely (POS tablet, printer), or user error</td><td>Product registry + guided questions</td></tr>
     </table>
@@ -105,7 +106,7 @@
   </div>
 
   <h2 id="s3"><span class="secnum">3</span>The workflow</h2>
-  <p>The control flow is deterministic: predefined stages and branch logic, with the language model doing judgment work <i>inside</i> stages (symptom classification, natural conversation, summarization). This follows the reliability principle that production agentic systems should be workflows first, agents only where the task genuinely requires open-ended behavior.</p>
+  <p>The control flow is deterministic: predefined stages and branch logic, with the language model doing judgment work <i>inside</i> stages (symptom classification, natural conversation, summarization). This follows the reliability principle that production agentic systems should be workflows first, agents only where the task genuinely requires open-ended behavior. Every call carries an explicit status at all times: <b>routed</b> to a diagnosis branch, <b>needs clarification</b> (a provisional route plus a required next action, never a forced conclusion), <b>handoff</b> to a human specialist, or <b>no fault confirmed</b>.</p>
 
   <div class="flow">
     <div class="stage"><b>0 · Answer &amp; stabilize</b><span>Acknowledge urgency in the merchant's language: "Let's get you taking payments again." Set expectations for the next two minutes. No account data and no payment fallbacks yet: those wait for verification, because offering payment alternatives to an unverified caller is a card-not-present fraud channel.</span></div>
@@ -120,7 +121,7 @@
       <div class="branch"><span class="bl">A</span><b class="t">Platform incident</b><br>Tell the merchant it is not their fault, give status and expected resolution, log for callback. Suppress troubleshooting.</div>
       <div class="branch"><span class="bl">B</span><b class="t">Local connectivity</b><br>Guided recovery: network check, reboot, SIM or Wi-Fi failover where the hardware supports it. Verify each step against telemetry, not just "did that work?"</div>
       <div class="branch"><span class="bl">C</span><b class="t">Device fault / software</b><br>Remote checks, push update if safe (confirm first). If hardware is dead: replacement flow with clear timeline.</div>
-      <div class="branch"><span class="bl">D</span><b class="t">Account-level hold</b><br>Never speculate about reasons on the call. Acknowledge, state that a specialist must handle it, warm-transfer with priority.</div>
+      <div class="branch"><span class="bl">D</span><b class="t">Account-level restriction</b><br>Never speculate about reasons on the call. Acknowledge, state that a specialist must handle it, warm-transfer with priority.</div>
       <div class="branch"><span class="bl">E</span><b class="t">Card-side declines</b><br>Show the terminal works: point to decline codes, explain issuer declines, reassure. Evidence, not apology.</div>
       <div class="branch"><span class="bl">F</span><b class="t">Ambiguous / other device</b><br>Disambiguate device (terminal vs. POS tablet vs. printer). One more signal or question; if still unclear, human.</div>
     </div>
@@ -130,19 +131,191 @@
     <div class="stage"><b>5 · Close, or hand off warm</b><span>Close: verified success, summary spoken and logged, ticket written. Hand off: warm transfer with the full context package (see Escalation and handoff) so the merchant never repeats themselves.</span></div>
   </div>
 
+  <h3>The canonical decision path, end to end</h3>
+  <p>The flowchart answers <b>"where did the case travel"</b>; the executable decision model's rule trace answers <b>"why"</b>. How to read it: rounded boxes are process steps, diamonds are decisions, cut-corner boxes are hard gates that outrank diagnosis, and slanted boxes are warm handoffs. Solid boxes at the right are diagnosis branches reached directly from a gate; dashed boxes are state changes, not routes. Terminology matches the decision model exactly.</p>
+  <figure class="fc-figure">
+    <svg viewBox="0 0 720 1060" role="img" aria-label="Flowchart of the canonical decision path from call begins to close or warm handoff; a full text version follows below" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="fcArw" viewBox="0 0 10 10" refX="7.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#101210"/></marker>
+      </defs>
+
+      <!-- call begins -->
+      <rect x="180" y="14" width="160" height="34" rx="17" fill="#101210"/>
+      <text x="260" y="35" text-anchor="middle" font-family="Roboto Mono" font-size="9" font-weight="700" letter-spacing="2" fill="#9fe870">CALL BEGINS</text>
+      <line x1="260" y1="48" x2="260" y2="62" stroke="#101210" stroke-width="1.4" marker-end="url(#fcArw)"/>
+
+      <!-- stabilize -->
+      <rect x="150" y="64" width="220" height="46" rx="9" fill="#f0f0ed" stroke="#101210" stroke-width="1.2"/>
+      <text x="260" y="83" text-anchor="middle" font-family="Mulish" font-size="10" font-weight="800" fill="#101210">Stabilize</text>
+      <text x="260" y="97" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">calm the urgency, set expectations</text>
+      <line x1="260" y1="110" x2="260" y2="124" stroke="#101210" stroke-width="1.4" marker-end="url(#fcArw)"/>
+
+      <!-- verify caller (hard gate) -->
+      <polygon points="162,126 358,126 370,138 370,166 358,178 162,178 150,166 150,138" fill="#101210" stroke="#9fe870" stroke-width="1.4"/>
+      <text x="260" y="148" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#9fe870">Hard gate · Verify caller</text>
+      <text x="260" y="163" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#d6d6d3">tiered assurance before any account data</text>
+      <line x1="370" y1="152" x2="466" y2="152" stroke="#b8863f" stroke-width="1.2" stroke-dasharray="4 4"/>
+      <rect x="468" y="128" width="230" height="50" rx="8" fill="#ffffff" stroke="#b8863f" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <text x="583" y="148" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#6b6c69">verification failed &#8594; needs clarification:</text>
+      <text x="583" y="160" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#6b6c69">provisional route only, account actions locked</text>
+      <line x1="260" y1="178" x2="260" y2="192" stroke="#101210" stroke-width="1.4" marker-end="url(#fcArw)"/>
+
+      <!-- human gates -->
+      <polygon points="162,194 358,194 370,206 370,240 358,252 162,252 150,240 150,206" fill="#101210" stroke="#9fe870" stroke-width="1.4"/>
+      <text x="260" y="213" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#9fe870">Hard gates · Human first</text>
+      <text x="260" y="228" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#d6d6d3">human requested: honored on the first ask</text>
+      <text x="260" y="240" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#d6d6d3">repeat contact, prior fix unverified</text>
+      <line x1="370" y1="223" x2="474" y2="223" stroke="#101210" stroke-width="1.3" marker-end="url(#fcArw)"/>
+      <polygon points="490,205 698,205 686,241 478,241" fill="#f7f7f5" stroke="#101210" stroke-width="1.3"/>
+      <text x="588" y="227" text-anchor="middle" font-family="Mulish" font-size="8.2" font-weight="800" fill="#101210">Warm handoff</text>
+      <line x1="260" y1="252" x2="260" y2="266" stroke="#101210" stroke-width="1.4" marker-end="url(#fcArw)"/>
+
+      <!-- signal availability -->
+      <polygon points="260,268 380,302 260,336 140,302" fill="#ffffff" stroke="#101210" stroke-width="1.2"/>
+      <text x="260" y="299" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#101210">Signal availability</text>
+      <text x="260" y="313" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">signal APIs reachable?</text>
+      <line x1="380" y1="302" x2="466" y2="302" stroke="#b8863f" stroke-width="1.2" stroke-dasharray="4 4"/>
+      <rect x="468" y="278" width="230" height="48" rx="8" fill="#ffffff" stroke="#b8863f" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <text x="583" y="297" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#6b6c69">unreachable &#8594; degraded mode:</text>
+      <text x="583" y="309" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#6b6c69">symptom-only diagnosis, reduced autonomy</text>
+      <line x1="260" y1="336" x2="260" y2="350" stroke="#101210" stroke-width="1.4" marker-end="url(#fcArw)"/>
+
+      <!-- payment-availability blockers -->
+      <polygon points="162,352 358,352 370,364 370,398 358,410 162,410 150,398 150,364" fill="#101210" stroke="#9fe870" stroke-width="1.4"/>
+      <text x="260" y="371" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#9fe870">Hard gate · Payment-availability blockers</text>
+      <text x="260" y="386" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#d6d6d3">payment acceptance restricted or blocked</text>
+      <text x="260" y="398" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#d6d6d3">outranks any technical fault</text>
+      <line x1="370" y1="381" x2="464" y2="381" stroke="#101210" stroke-width="1.3" marker-end="url(#fcArw)"/>
+      <rect x="468" y="356" width="230" height="50" rx="9" fill="rgba(159,232,112,0.16)" stroke="#101210" stroke-width="1.2"/>
+      <text x="583" y="376" text-anchor="middle" font-family="Mulish" font-size="8.2" font-weight="800" fill="#101210">Branch D · Account-level restriction</text>
+      <text x="583" y="390" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#6b6c69">specialist warm handoff, reasons never on the call</text>
+      <line x1="260" y1="410" x2="260" y2="424" stroke="#101210" stroke-width="1.4" marker-end="url(#fcArw)"/>
+
+      <!-- incident status -->
+      <polygon points="260,426 380,460 260,494 140,460" fill="#ffffff" stroke="#101210" stroke-width="1.2"/>
+      <text x="260" y="457" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#101210">Incident status</text>
+      <text x="260" y="471" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">incident confirmed? symptom spiking?</text>
+      <line x1="380" y1="460" x2="464" y2="446" stroke="#101210" stroke-width="1.3" marker-end="url(#fcArw)"/>
+      <rect x="468" y="422" width="230" height="44" rx="9" fill="rgba(159,232,112,0.16)" stroke="#101210" stroke-width="1.2"/>
+      <text x="583" y="440" text-anchor="middle" font-family="Mulish" font-size="8.2" font-weight="800" fill="#101210">Branch A · Platform incident</text>
+      <text x="583" y="454" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#6b6c69">broadcast mode when a spike joins a confirmed incident</text>
+      <rect x="468" y="472" width="230" height="30" rx="8" fill="#ffffff" stroke="#b8863f" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <text x="583" y="490" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#6b6c69">spike only &#8594; suspected incident, conservative diagnosis</text>
+      <line x1="260" y1="494" x2="260" y2="508" stroke="#101210" stroke-width="1.4" marker-end="url(#fcArw)"/>
+
+      <!-- device identification -->
+      <polygon points="260,510 380,544 260,578 140,544" fill="#ffffff" stroke="#101210" stroke-width="1.2"/>
+      <text x="260" y="541" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#101210">Device identification</text>
+      <text x="260" y="555" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">terminal? POS tablet? printer? unclear?</text>
+      <line x1="380" y1="544" x2="464" y2="532" stroke="#101210" stroke-width="1.3" marker-end="url(#fcArw)"/>
+      <rect x="468" y="512" width="230" height="38" rx="9" fill="rgba(159,232,112,0.16)" stroke="#101210" stroke-width="1.2"/>
+      <text x="583" y="535" text-anchor="middle" font-family="Mulish" font-size="8.2" font-weight="800" fill="#101210">Branch F · Wrong or unclear device</text>
+      <rect x="468" y="556" width="230" height="30" rx="8" fill="#ffffff" stroke="#b8863f" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <text x="583" y="574" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#6b6c69">unclear after two clarification attempts &#8594; warm handoff</text>
+      <line x1="260" y1="578" x2="260" y2="592" stroke="#101210" stroke-width="1.4" marker-end="url(#fcArw)"/>
+
+      <!-- technical diagnosis -->
+      <rect x="150" y="594" width="220" height="50" rx="9" fill="#f0f0ed" stroke="#101210" stroke-width="1.2"/>
+      <text x="260" y="614" text-anchor="middle" font-family="Mulish" font-size="10" font-weight="800" fill="#101210">Technical diagnosis</text>
+      <text x="260" y="629" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">compose the signals with the reported symptom</text>
+      <line x1="370" y1="619" x2="466" y2="619" stroke="#b8863f" stroke-width="1.2" stroke-dasharray="4 4"/>
+      <rect x="468" y="596" width="230" height="48" rx="8" fill="#ffffff" stroke="#b8863f" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <text x="583" y="615" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#6b6c69">no decisive evidence &#8594; needs clarification:</text>
+      <text x="583" y="627" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#6b6c69">provisional route + required next action</text>
+
+      <!-- branch fan -->
+      <line x1="260" y1="644" x2="70" y2="674" stroke="#101210" stroke-width="1.1" marker-end="url(#fcArw)"/>
+      <line x1="260" y1="644" x2="186" y2="674" stroke="#101210" stroke-width="1.1" marker-end="url(#fcArw)"/>
+      <line x1="260" y1="644" x2="302" y2="674" stroke="#101210" stroke-width="1.1" marker-end="url(#fcArw)"/>
+      <line x1="260" y1="644" x2="418" y2="674" stroke="#101210" stroke-width="1.1" marker-end="url(#fcArw)"/>
+      <line x1="260" y1="644" x2="534" y2="674" stroke="#101210" stroke-width="1.1" marker-end="url(#fcArw)"/>
+      <line x1="260" y1="644" x2="650" y2="674" stroke="#101210" stroke-width="1.1" marker-end="url(#fcArw)"/>
+      <g font-family="Mulish" font-size="6.8" fill="#6b6c69" text-anchor="middle">
+        <rect x="18" y="676" width="104" height="52" rx="8" fill="#ffffff" stroke="#101210" stroke-width="1.1"/>
+        <text x="70" y="694" font-family="Roboto Mono" font-size="10" font-weight="700" fill="#101210">A</text>
+        <text x="70" y="707">Platform</text><text x="70" y="717">incident</text>
+        <rect x="134" y="676" width="104" height="52" rx="8" fill="#ffffff" stroke="#101210" stroke-width="1.1"/>
+        <text x="186" y="694" font-family="Roboto Mono" font-size="10" font-weight="700" fill="#101210">B</text>
+        <text x="186" y="707">Local</text><text x="186" y="717">connectivity</text>
+        <rect x="250" y="676" width="104" height="52" rx="8" fill="#ffffff" stroke="#101210" stroke-width="1.1"/>
+        <text x="302" y="694" font-family="Roboto Mono" font-size="10" font-weight="700" fill="#101210">C</text>
+        <text x="302" y="707">Device fault /</text><text x="302" y="717">software</text>
+        <rect x="366" y="676" width="104" height="52" rx="8" fill="#ffffff" stroke="#101210" stroke-width="1.1"/>
+        <text x="418" y="694" font-family="Roboto Mono" font-size="10" font-weight="700" fill="#101210">D</text>
+        <text x="418" y="707">Account-level</text><text x="418" y="717">restriction</text>
+        <rect x="482" y="676" width="104" height="52" rx="8" fill="#ffffff" stroke="#101210" stroke-width="1.1"/>
+        <text x="534" y="694" font-family="Roboto Mono" font-size="10" font-weight="700" fill="#101210">E</text>
+        <text x="534" y="707">Card-side</text><text x="534" y="717">declines</text>
+        <rect x="598" y="676" width="104" height="52" rx="8" fill="#ffffff" stroke="#101210" stroke-width="1.1"/>
+        <text x="650" y="694" font-family="Roboto Mono" font-size="10" font-weight="700" fill="#101210">F</text>
+        <text x="650" y="707">Wrong or</text><text x="650" y="717">unclear device</text>
+      </g>
+      <line x1="70" y1="728" x2="252" y2="762" stroke="#101210" stroke-width="1"/>
+      <line x1="186" y1="728" x2="256" y2="762" stroke="#101210" stroke-width="1"/>
+      <line x1="302" y1="728" x2="262" y2="762" stroke="#101210" stroke-width="1"/>
+      <line x1="418" y1="728" x2="266" y2="762" stroke="#101210" stroke-width="1"/>
+      <line x1="534" y1="728" x2="270" y2="762" stroke="#101210" stroke-width="1"/>
+      <line x1="650" y1="728" x2="274" y2="762" stroke="#101210" stroke-width="1"/>
+
+      <!-- permission overlays -->
+      <rect x="150" y="764" width="220" height="50" rx="9" fill="#f0f0ed" stroke="#101210" stroke-width="1.2"/>
+      <text x="260" y="784" text-anchor="middle" font-family="Mulish" font-size="10" font-weight="800" fill="#101210">Permission overlays</text>
+      <text x="260" y="799" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">autonomous · confirm first · locked · never</text>
+      <line x1="260" y1="814" x2="260" y2="828" stroke="#101210" stroke-width="1.4" marker-end="url(#fcArw)"/>
+
+      <!-- act -->
+      <rect x="150" y="830" width="220" height="44" rx="9" fill="#f0f0ed" stroke="#101210" stroke-width="1.2"/>
+      <text x="260" y="848" text-anchor="middle" font-family="Mulish" font-size="10" font-weight="800" fill="#101210">Act</text>
+      <text x="260" y="862" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">inside the permission gate, step by step</text>
+      <line x1="260" y1="874" x2="260" y2="888" stroke="#101210" stroke-width="1.4" marker-end="url(#fcArw)"/>
+
+      <!-- outcome verification -->
+      <polygon points="260,890 380,924 260,958 140,924" fill="#ffffff" stroke="#101210" stroke-width="1.2"/>
+      <text x="260" y="921" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#101210">Outcome verification</text>
+      <text x="260" y="935" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">verified resolution in telemetry?</text>
+      <line x1="380" y1="924" x2="474" y2="924" stroke="#101210" stroke-width="1.3" marker-end="url(#fcArw)"/>
+      <text x="428" y="915" text-anchor="middle" font-family="Roboto Mono" font-size="6.6" fill="#6b6c69">two failed fix cycles</text>
+      <line x1="260" y1="958" x2="260" y2="984" stroke="#101210" stroke-width="1.4" marker-end="url(#fcArw)"/>
+      <text x="284" y="974" font-family="Roboto Mono" font-size="6.6" fill="#6b6c69">verified</text>
+
+      <!-- terminals -->
+      <rect x="140" y="988" width="240" height="40" rx="20" fill="#101210"/>
+      <text x="260" y="1012" text-anchor="middle" font-family="Roboto Mono" font-size="8.5" font-weight="700" letter-spacing="1.5" fill="#9fe870">CLOSE · VERIFIED RESOLUTION</text>
+      <polygon points="490,988 698,988 686,1040 478,1040" fill="#f7f7f5" stroke="#101210" stroke-width="1.3"/>
+      <text x="588" y="1009" text-anchor="middle" font-family="Mulish" font-size="8.8" font-weight="800" fill="#101210">Warm handoff · human specialist</text>
+      <text x="588" y="1024" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#6b6c69">full context package; the merchant never repeats themselves</text>
+    </svg>
+  </figure>
+  <details class="fc-alt">
+    <summary>Text version of the flowchart</summary>
+    <ol>
+      <li><b>Call begins</b>, then <b>stabilize</b>: calm the urgency and set expectations.</li>
+      <li><b>Hard gate, verify caller:</b> tiered assurance before any account data. If verification fails, the case becomes needs clarification: provisional route only, account actions locked.</li>
+      <li><b>Hard gates, human first:</b> a requested human is honored on the first ask, and a repeat contact whose prior fix was never verified goes straight to a warm handoff.</li>
+      <li><b>Signal availability:</b> if the signal APIs are unreachable, the workflow enters degraded mode with symptom-only diagnosis and reduced autonomy.</li>
+      <li><b>Hard gate, payment-availability blockers:</b> payment acceptance restricted or blocked routes to branch D, account-level restriction, with a specialist warm handoff; this outranks any technical fault.</li>
+      <li><b>Incident status:</b> a confirmed incident routes to branch A, platform incident, with broadcast mode when a spike joins it; a spike alone enters suspected-incident mode while conservative diagnosis continues.</li>
+      <li><b>Device identification:</b> a wrong or unclear device routes to branch F; still unclear after two clarification attempts becomes a warm handoff.</li>
+      <li><b>Technical diagnosis:</b> the signals are composed with the reported symptom and fan out to the six diagnosis branches A to F. Without decisive evidence the case is needs clarification, carrying a provisional route and a required next action.</li>
+      <li><b>Permission overlays:</b> every action is classed autonomous, confirm first, locked or never.</li>
+      <li><b>Act</b>, then <b>outcome verification:</b> a verified resolution in telemetry closes the case; two failed fix cycles are a hard stop into a warm handoff with the full context package, so the merchant never repeats themselves.</li>
+    </ol>
+  </details>
+
   <h2 id="s4"><span class="secnum">4</span>What the AI may do: permissions</h2>
   <div class="table-scroll">
     <table>
       <caption class="vh">Permission levels and allowed actions</caption>
       <tr><th scope="col" style="width:16%">Level</th><th scope="col">Actions</th></tr>
-      <tr><td><span class="tag auto">Autonomous</span></td><td>Read any signal; guide reboot and network recovery; explain decline codes; resend receipts; create and update tickets; schedule callbacks; send self-serve links.</td></tr>
+      <tr><td><span class="tag auto">Autonomous</span></td><td>Read the minimum purpose-limited signals required for the active workflow, subject to caller verification, market configuration and audit logging; guide reboot and network recovery; explain decline codes; resend receipts; create and update tickets; schedule callbacks; send self-serve links.</td></tr>
       <tr><td><span class="tag confirm">Confirm first</span></td><td>Push software updates; remote-restart a terminal; order replacement hardware; change non-financial settings. State what will happen, get an explicit yes.</td></tr>
+      <tr><td><span class="tag locked">Locked</span></td><td>Actions blocked by verification or system state, not prohibited outright: account data and payment fallbacks while caller assurance is low; every account-linked action while verification has failed; software updates on DE fiscal devices pending TSE validation; remote actions while the signal systems are down. A locked item unlocks the moment the blocking state clears.</td></tr>
       <tr><td><span class="tag never">Never</span></td><td>Discuss the reasons behind a risk or KYC hold; change payout accounts or financial settings; quote settlement amounts without verified data; promise refunds, credits or waivers; keep a merchant in troubleshooting after two failed fix cycles.</td></tr>
     </table>
   </div>
   <div class="why-box">
     <span class="lbl">Compliance guardrails · non-negotiable in all six markets</span>
-    <p>The AI discloses that it is an automated assistant at the start of every call (EU AI Act transparency obligation). Call recording and transcript use follow GDPR: consent and retention per market rules, and transcripts are anonymized before they are used for testing. The AI never asks for a full card number, and if a caller reads one aloud, the recording is redacted at that segment (PCI DSS). These are design constraints, not features: any workflow change is checked against them before release.</p>
+    <p>The assistant identifies itself as AI at the start of every call, as a trust principle and in preparation for the EU AI Act transparency obligation applying from 2 August 2026. Call recording and transcript use rest on a documented lawful basis with clear notice, purpose limitation, data minimization, access controls, retention rules and data-subject rights, with legal review per market. Transcripts used for testing are redacted and de-identified; material that remains reasonably linkable to a person continues to be treated as personal data. The assistant never requests card data; recording is paused, suppressed or prevented from capturing it where possible, and accidental capture is immediately redacted under applicable PCI controls. These are design constraints, not features: any workflow change is checked against them before release.</p>
   </div>
 
   <h2 id="s5"><span class="secnum">5</span>Edge cases: where this workflow will misbehave</h2>
@@ -168,7 +341,7 @@
     <table>
       <caption class="vh">Diagnosis edge cases and designed behavior</caption>
       <tr><th scope="col" style="width:32%">Edge case</th><th scope="col">Designed behavior</th></tr>
-      <tr><td>Conflicting signals: telemetry says online, merchant says dead</td><td>Trust neither alone. Run a terminal-to-host connection test or have the merchant attempt a payment; if it fails, treat telemetry as stale and follow the merchant's reality.</td></tr>
+      <tr><td>Conflicting signals: telemetry says online, merchant says dead</td><td>Trust neither alone, and issue no final branch: the case is <b>needs clarification</b> with a provisional route until a terminal-to-host connection test runs. A connectivity failure routes to branch B, a device failure to branch C, a pass moves scrutiny to the remaining evidence, and an unavailable test tool means proceeding on the symptom with reduced autonomy.</td></tr>
       <tr><td>Merchant has already rebooted ("I tried that")</td><td>Believe them. Skip the step, say why the next step differs. Repeating known-failed steps destroys credibility.</td></tr>
       <tr><td>Two problems at once (offline <i>and</i> account hold)</td><td>Identify all active blockers. Resolve or escalate the blocker that currently determines payment availability, and carry secondary faults in the case context. An account-level restriction can block payments even with a healthy terminal.</td></tr>
       <tr><td>Intermittent fault ("it works sometimes")</td><td>Do not force a binary diagnosis. Log a pattern-watch on telemetry, set expectations, schedule follow-up rather than a fake fix.</td></tr>
@@ -187,7 +360,7 @@
       <tr><td>Anger, distress, or a threat to churn detected</td><td>Sentiment triggers escalation priority even if the diagnosis is going well.</td></tr>
       <tr><td>Terminal battery dead or device unusable during the call</td><td>Switch channel: steps by SMS or email, callback scheduled after a charging window.</td></tr>
       <tr><td>The AI's own signal sources fail (telemetry or transaction APIs down, possibly during the very platform incident being diagnosed)</td><td>Degrade honestly: fall back to question-driven diagnosis with reduced autonomy and say the systems are temporarily unavailable. If the Voice AI itself is degraded, route straight to a human with honest queue messaging. Design for missing data, not only wrong data.</td></tr>
-      <tr><td>Mass incident: a sudden spike of the same symptom</td><td>Spike detection flips branch A into broadcast mode: a short queue-buster message, status page, callback list. Protects human capacity for true edge cases.</td></tr>
+      <tr><td>Mass incident: a sudden spike of the same symptom</td><td>Incident and spike are separate facts. A confirmed incident routes to branch A with normal incident handling; confirmed incident plus a spike flips branch A into broadcast mode (short queue-buster message, status page, callback list); a spike without a confirmed incident enters suspected-incident mode, where conservative diagnosis continues while the incident process is flagged.</td></tr>
       <tr><td>After-hours call, human queue closed</td><td>Say so honestly, take a structured callback booking, send self-serve steps in writing. Never simulate a human queue that doesn't exist.</td></tr>
     </table>
   </div>
@@ -197,8 +370,9 @@
     <div class="col-card">
       <h3>Triggers</h3>
       <ul>
-        <li><b>Deterministic:</b> branch D (account holds); two failed fix cycles; verification failure on account actions; repeat contact within 7 days.</li>
+        <li><b>Deterministic:</b> branch D (account-level restrictions); two failed fix cycles; verification failure on account actions; repeat contact within 7 days.</li>
         <li><b>Model-signaled:</b> low classification confidence after two loops; negative sentiment threshold; explicit human request.</li>
+        <li><b>Recorded as a list:</b> every fired trigger is preserved in the order it fired; a later trigger never erases an earlier one.</li>
       </ul>
     </div>
     <div class="col-card">
@@ -254,7 +428,7 @@
   <h2 id="s9"><span class="secnum">9</span>Measuring what matters after launch</h2>
   <p><b>Containment is not resolution.</b> An AI that "handled the call" while the merchant still cannot take payments has failed twice: it failed the merchant, and it hid the failure from the team. This workflow has an unusual advantage: resolution is objectively verifiable.</p>
   <div class="why-box">
-    <span class="lbl">Ground-truth metric · verified resolution</span>
+    <span class="lbl">One measurement principle · branch-specific verified outcomes</span>
     <p>For hardware and connectivity fixes (branches B, C): the terminal processes a live transaction within 15 minutes of call end, observed in telemetry; the window is a provisional target, to be re-baselined on Flatpay's transaction-gap data per merchant type. Not "the caller didn't escalate." Not a survey. A payment. The other branches get their own success definitions: incident communicated and callback kept (A), case with the right specialist inside the SLA (D), merchant confirms understanding (E).</p>
   </div>
   <div class="table-scroll">
@@ -268,7 +442,11 @@
       <tr><td>Merchant satisfaction, AI-closed vs. human-closed calls</td><td>Resolution achieved at the cost of trust.</td></tr>
     </table>
   </div>
-  <p><b>The improvement loop:</b> a weekly review of escalations, repeat contacts, and failed verifications. Each failure is classified: missing signal, missing branch, bad script, or model error. Fixes are prioritized by calls affected times resolution lift, and each becomes a new test case in the stress-testing suite. New data-source investments (for example connecting router diagnostics, or logistics tracking for replacements, to be validated with ops and logistics) are ranked the same way. Per-branch targets should be set from Flatpay's own replay baseline rather than industry averages, which vary widely with how loosely "resolved" is defined. That definition discipline is the point of the ground-truth metric above.</p>
+  <p><b>The improvement loop:</b> a weekly review of escalations, repeat contacts, and failed verifications. Each failure is classified: missing signal, missing branch, bad script, or model error. Fixes are prioritized by calls affected times resolution lift, and each becomes a new test case in the stress-testing suite. New data-source investments (for example connecting router diagnostics, or logistics tracking for replacements, to be validated with ops and logistics) are ranked the same way. Per-branch targets should be set from Flatpay's own replay baseline rather than industry averages, which vary widely with how loosely "resolved" is defined. That definition discipline is the point of the measurement principle above.</p>
+
+  <h2 id="snext"><span class="secnum">+</span>What I would build next, inside Flatpay</h2>
+  <p class="lead">With access to real systems, data and the teams, weeks 2 to 4 of this work produce the artifacts a production rollout needs: a cross-functional service blueprint, a system integration and failure map, a full permission and verification matrix, a warm-handoff sequence design, a stage-gated rollout plan with hold and rollback outcomes, a metric tree with branch-specific verified outcomes, and a failure taxonomy with named owners.</p>
+  <p>These are deliberately not mocked up here: built on assumptions instead of Flatpay's real systems, they would be speculation wearing the costume of rigor. Knowing which artifact belongs at which moment, and building it against reality rather than guesswork, is the job.</p>
 
   <h2 id="s10"><span class="secnum">10</span>Assumptions and how to validate them</h2>
   <p>The design depends on eight working assumptions about Flatpay internals, made to keep it concrete rather than generic. Each is listed with the fastest way to validate it through expert interviews and production data; none is stated as fact anywhere in this specification.</p>

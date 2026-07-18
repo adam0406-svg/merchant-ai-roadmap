@@ -1549,7 +1549,27 @@ html.sim-js .sim-nojs { display: none; }
 .tag { display: inline-block; font-family: var(--mono); font-weight: 700; font-size: 0.72rem; padding: 3px 12px; border-radius: 999px; color: #fff; letter-spacing: 0.03em; }
 .tag.auto { background: var(--tag-auto); }
 .tag.confirm { background: var(--tag-confirm); }
+.tag.locked { background: #8a6530; }
 .tag.never { background: var(--tag-never); }
+
+/* decision-path flowchart (workflow spec, section 3) */
+.fc-figure {
+  margin: 26px 0 10px; padding: 18px 18px 10px;
+  background: #fff; border: 1px solid #e5e5e2; border-radius: 14px;
+}
+.fc-figure svg { display: block; width: 100%; height: auto; }
+.fc-alt { margin: 12px 0 6px; background: #fbfbfa; border: 1px solid #e5e5e2; border-radius: 12px; }
+.fc-alt summary {
+  cursor: pointer; padding: 10px 14px; list-style: none;
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: #2b2c2a;
+}
+.fc-alt summary::-webkit-details-marker { display: none; }
+.fc-alt summary::after { content: "+"; float: right; }
+.fc-alt[open] summary::after { content: "\2212"; }
+.fc-alt summary:focus-visible { outline: 2px solid #2b2c2a; outline-offset: -2px; }
+.fc-alt ol { margin: 0 16px 14px; padding-left: 20px; font-size: 0.86rem; color: #3f403e; line-height: 1.65; }
+.fc-alt li { margin-bottom: 6px; }
 
 .mkt { display: inline-block; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 5px 11px; font-family: var(--mono); font-weight: 700; font-size: 0.82rem; color: var(--green); margin: 0 6px 6px 0; }
 
