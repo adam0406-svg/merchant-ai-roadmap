@@ -121,7 +121,9 @@ body::after {
   .vz-sweep, .vz-ping, .vz-br, .vz-dot, .vz-layer, .vz-ekg, .vz-chk,
   .bv-lens, .bv-hit, .bv-drop, .bv-check, .viz-wrap { animation: none !important; }
   .bt-packet, .dial-sat, .forge-bit, .holo-burst, .forge-arc,
-  .holo-flash, .holo-shock, .holo-beam, .vz-bit { display: none; }
+  .holo-flash, .holo-shock, .holo-beam, .vz-bit, .fcx-packet { display: none !important; }
+  .fcx-flow, .fcx-ring { animation: none !important; }
+  .fcx-ring { opacity: 0; }
   .vz-ping { opacity: 0; }
   .vz-ekg, .vz-chk, .bv-check { stroke-dashoffset: 0; }
   .bv-drop { opacity: 0; }
@@ -593,31 +595,6 @@ html.embed .wf-hero { min-height: auto; padding-top: 46px; }
   transition: color 0.25s ease;
 }
 .hero-textlink:hover, .hero-textlink:focus-visible { color: var(--lime); }
-
-/* proof strip: what was built, how, its status, related work */
-.sec.proof { padding: clamp(40px, 6vh, 64px) 0; }
-.proof-strip {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
-  border: 1px solid rgba(159, 232, 112, 0.16); border-radius: 16px;
-  background: rgba(255, 255, 255, 0.02);
-}
-.proof-cell { padding: 20px 22px; }
-.proof-cell + .proof-cell { border-left: 1px solid rgba(159, 232, 112, 0.12); }
-.proof-h {
-  display: block; margin-bottom: 8px;
-  font-family: var(--mono); font-size: 0.62rem; font-weight: 700;
-  letter-spacing: 0.22em; text-transform: uppercase; color: var(--lime);
-}
-.proof-cell p { margin: 0; font-size: 0.82rem; line-height: 1.6; color: var(--mist); }
-@media (max-width: 900px) {
-  .proof-strip { grid-template-columns: repeat(2, 1fr); }
-  .proof-cell:nth-child(3) { border-left: none; }
-  .proof-cell:nth-child(n+3) { border-top: 1px solid rgba(159, 232, 112, 0.12); }
-}
-@media (max-width: 520px) {
-  .proof-strip { grid-template-columns: 1fr; }
-  .proof-cell + .proof-cell { border-left: none; border-top: 1px solid rgba(159, 232, 112, 0.12); }
-}
 
 /* spec link block under the simulator */
 .sec.speclink { padding: clamp(48px, 7vh, 80px) 0; }
@@ -1552,12 +1529,34 @@ html.sim-js .sim-nojs { display: none; }
 .tag.locked { background: #8a6530; }
 .tag.never { background: var(--tag-never); }
 
-/* decision-path flowchart (workflow spec, section 3) */
-.fc-figure {
-  margin: 26px 0 10px; padding: 18px 18px 10px;
-  background: #fff; border: 1px solid #e5e5e2; border-radius: 14px;
+/* decision-path flowchart (workflow spec, section 3): dark console panel */
+.fc-console { max-width: 100%; margin: 26px 0 12px; }
+.fc-body { padding: 22px 18px 10px; }
+.fc-body svg { display: block; width: 100%; height: auto; }
+.fc-console .scan { animation: fcscan 9s linear infinite; }
+@keyframes fcscan { to { transform: translateY(1400px); } }
+.fcx-flow { animation: fcxdash 1.5s linear infinite; }
+@keyframes fcxdash { to { stroke-dashoffset: -24; } }
+.fcx-glow { filter: drop-shadow(0 0 7px rgba(159, 232, 112, 0.4)); }
+.fcx-glow-blue { filter: drop-shadow(0 0 7px rgba(159, 208, 240, 0.35)); }
+.fcx-ring { transform-box: fill-box; transform-origin: center; animation: fcxping 2.8s ease-out infinite; }
+@keyframes fcxping {
+  0% { opacity: 0.8; transform: scale(0.55); }
+  75% { opacity: 0; transform: scale(1.35); }
+  100% { opacity: 0; transform: scale(1.35); }
 }
-.fc-figure svg { display: block; width: 100%; height: auto; }
+.fcx-packet { display: none; }
+@supports (offset-path: path("M0 0 L0 1")) {
+  .fcx-packet {
+    display: block;
+    offset-path: path("M260 50 L260 1000");
+    offset-rotate: 0deg;
+    filter: drop-shadow(0 0 6px rgba(159, 232, 112, 0.8));
+    animation: fcxtravel 7.5s linear infinite;
+  }
+  .fcx-packet.p2 { animation-delay: -3.7s; }
+}
+@keyframes fcxtravel { from { offset-distance: 0%; } to { offset-distance: 100%; } }
 .fc-alt { margin: 12px 0 6px; background: #fbfbfa; border: 1px solid #e5e5e2; border-radius: 12px; }
 .fc-alt summary {
   cursor: pointer; padding: 10px 14px; list-style: none;
