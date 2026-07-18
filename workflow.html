@@ -150,8 +150,8 @@
           <marker id="fcxAb" viewBox="0 0 10 10" refX="7.5" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#9fd0f0"/></marker>
         </defs>
 
-        <!-- trunk segments + travelling packets (drawn first, nodes paint on top) -->
-        <g stroke="rgba(159,232,112,0.55)" stroke-width="1.4" stroke-dasharray="5 7" class="fcx-flow" fill="none">
+        <!-- trunk segments (drawn first, nodes paint on top) -->
+        <g stroke="rgba(159,232,112,0.55)" stroke-width="1.4" stroke-dasharray="5 7" fill="none">
           <line x1="260" y1="50" x2="260" y2="64"/>
           <line x1="260" y1="112" x2="260" y2="126"/>
           <line x1="260" y1="180" x2="260" y2="194"/>
@@ -162,9 +162,6 @@
           <line x1="260" y1="580" x2="260" y2="594"/>
           <line x1="260" y1="976" x2="260" y2="998"/>
         </g>
-        <circle class="fcx-packet" r="3.4" fill="#9fe870"/>
-        <circle class="fcx-packet p2" r="2.8" fill="#9fe870"/>
-
         <!-- call begins -->
         <rect x="180" y="16" width="160" height="34" rx="17" fill="#101211" stroke="rgba(159,232,112,0.7)" stroke-width="1.4" class="fcx-glow"/>
         <text x="260" y="37" text-anchor="middle" font-family="Roboto Mono" font-size="9" font-weight="700" letter-spacing="2" fill="#9fe870">CALL BEGINS</text>
@@ -233,7 +230,6 @@
         <text x="482" y="572" font-family="Roboto Mono" font-size="7" fill="#f0c66a">unclear after two attempts &#8594; warm handoff</text>
 
         <!-- technical diagnosis -->
-        <circle class="fcx-ring" cx="260" cy="619" r="42" fill="none" stroke="rgba(159,232,112,0.5)" stroke-width="1.2"/>
         <rect x="148" y="594" width="224" height="50" rx="10" fill="#171b12" stroke="rgba(159,232,112,0.4)" stroke-width="1.2"/>
         <text x="260" y="614" text-anchor="middle" font-family="Mulish" font-size="10" font-weight="800" fill="#ffffff">Technical diagnosis</text>
         <text x="260" y="629" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#a9aba7">compose the signals with the reported symptom</text>
@@ -243,7 +239,7 @@
         <text x="412" y="627" font-family="Roboto Mono" font-size="7" fill="rgba(240,198,106,0.7)">provisional route + required next action</text>
 
         <!-- branch fan -->
-        <g stroke="rgba(159,232,112,0.45)" stroke-width="1.1" stroke-dasharray="4 6" class="fcx-flow" fill="none">
+        <g stroke="rgba(159,232,112,0.45)" stroke-width="1.1" stroke-dasharray="4 6" fill="none">
           <line x1="260" y1="644" x2="70" y2="688"/>
           <line x1="260" y1="644" x2="186" y2="688"/>
           <line x1="260" y1="644" x2="302" y2="688"/>
@@ -290,13 +286,13 @@
         <rect x="148" y="782" width="224" height="50" rx="10" fill="#171b12" stroke="rgba(159,232,112,0.4)" stroke-width="1.2"/>
         <text x="260" y="802" text-anchor="middle" font-family="Mulish" font-size="10" font-weight="800" fill="#ffffff">Permission overlays</text>
         <text x="260" y="817" text-anchor="middle" font-family="Roboto Mono" font-size="7" fill="#a9aba7">autonomous · confirm first · locked · never</text>
-        <line x1="260" y1="832" x2="260" y2="846" stroke="rgba(159,232,112,0.55)" stroke-width="1.4" stroke-dasharray="5 7" class="fcx-flow"/>
+        <line x1="260" y1="832" x2="260" y2="846" stroke="rgba(159,232,112,0.55)" stroke-width="1.4" stroke-dasharray="5 7"/>
 
         <!-- act -->
         <rect x="148" y="848" width="224" height="44" rx="10" fill="#171b12" stroke="rgba(159,232,112,0.4)" stroke-width="1.2"/>
         <text x="260" y="866" text-anchor="middle" font-family="Mulish" font-size="10" font-weight="800" fill="#ffffff">Act</text>
         <text x="260" y="880" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#a9aba7">inside the permission gate, step by step</text>
-        <line x1="260" y1="892" x2="260" y2="906" stroke="rgba(159,232,112,0.55)" stroke-width="1.4" stroke-dasharray="5 7" class="fcx-flow"/>
+        <line x1="260" y1="892" x2="260" y2="906" stroke="rgba(159,232,112,0.55)" stroke-width="1.4" stroke-dasharray="5 7"/>
 
         <!-- outcome verification -->
         <polygon points="260,908 380,942 260,976 140,942" fill="#101211" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
