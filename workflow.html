@@ -56,7 +56,7 @@
         <a href="#s3"><span class="toc-num">03</span><span class="toc-t">The workflow</span></a>
         <ol class="toc-sub">
           <li><a href="#s3-branches">Six diagnosis branches</a></li>
-          <li><a href="#s3-path">The canonical decision path</a></li>
+          <li><a href="#s3-path">The full decision path</a></li>
         </ol>
       </li>
       <li>
@@ -127,46 +127,105 @@
   <h2 id="s3"><span class="secnum">3</span>The workflow</h2>
   <p>The control flow is deterministic: predefined stages and branch logic, with the language model doing judgment work <i>inside</i> stages (symptom classification, natural conversation, summarization). This follows the reliability principle that production agentic systems should be workflows first, agents only where the task genuinely requires open-ended behavior. Every call carries an explicit status at all times: <b>routed</b> to a diagnosis branch, <b>needs clarification</b> (a provisional route plus a required next action, never a forced conclusion), <b>handoff</b> to a human specialist, or <b>no fault confirmed</b>.</p>
 
-  <div class="flow">
-    <div class="stage"><b>0 · Answer &amp; stabilize</b><span>Acknowledge urgency in the merchant's language: "Let's get you taking payments again." Set expectations for the next two minutes. No account data and no payment fallbacks yet: those wait for verification, because offering payment alternatives to an unverified caller is a card-not-present fraud channel.</span></div>
-    <div class="arrow">&#9660;</div>
-    <div class="stage"><b>1 · Identify &amp; verify</b><span>Identify via caller ID, org number, or terminal ID; authenticate with a real second factor (one-time code or callback to the number on file) since all three identifiers are public or spoofable. Tiered assurance: hardware troubleshooting at low assurance, account data and payment fallbacks (a payment link, where the market supports one) only after authentication. Then: the repeat-caller gate.</span></div>
-    <div class="arrow">&#9660;</div>
-    <div class="stage"><b>2 · Compose signals</b><span>Fetch telemetry, transaction log, account status, incident status in parallel <i>while</i> asking one high-yield question: "What does the screen show when you try?" Signals + answer feed classification.</span></div>
-    <div class="arrow">&#9660;</div>
-    <div class="stage hl"><b>3 · Route to a diagnosis branch</b><span>LLM classifies the symptom; deterministic rules pick the branch. If confidence is low: one clarifying question, max two loops, then human.</span></div>
-    <div class="arrow">&#9660;</div>
-    <div class="branches" id="s3-branches">
-      <div class="branch"><span class="bl">A</span><b class="t">Platform incident</b><br>Tell the merchant it is not their fault, give status and expected resolution, log for callback. Suppress troubleshooting.</div>
-      <div class="branch"><span class="bl">B</span><b class="t">Local connectivity</b><br>Guided recovery: network check, reboot, SIM or Wi-Fi failover where the hardware supports it. Verify each step against telemetry, not just "did that work?"</div>
-      <div class="branch"><span class="bl">C</span><b class="t">Device fault / software</b><br>Remote checks, push update if safe (confirm first). If hardware is dead: replacement flow with clear timeline.</div>
-      <div class="branch"><span class="bl">D</span><b class="t">Account-level restriction</b><br>Never speculate about reasons on the call. Acknowledge, state that a specialist must handle it, warm-transfer with priority.</div>
-      <div class="branch"><span class="bl">E</span><b class="t">Card-side declines</b><br>Show the terminal works: point to decline codes, explain issuer declines, reassure. Evidence, not apology.</div>
-      <div class="branch"><span class="bl">F</span><b class="t">Ambiguous / other device</b><br>Disambiguate device (terminal vs. POS tablet vs. printer). One more signal or question; if still unclear, human.</div>
+  <div class="wfj">
+    <div class="wfj-stage">
+      <span class="wfj-node"><svg aria-hidden="true" focusable="false" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="10" y="3" width="4" height="10" rx="2"/><path d="M7 11a5 5 0 0 0 10 0"/><line x1="12" y1="16" x2="12" y2="19"/><line x1="9" y1="19" x2="15" y2="19"/></svg></span>
+      <div class="wfj-body">
+        <span class="wfj-k">Step 0</span>
+        <b class="wfj-t">Answer &amp; stabilize</b>
+        <p class="wfj-p">Acknowledge urgency in the merchant's language: "Let's get you taking payments again." Set expectations for the next two minutes. No account data and no payment fallbacks yet: those wait for verification, because offering payment alternatives to an unverified caller is a card-not-present fraud channel.</p>
+      </div>
     </div>
-    <div class="arrow">&#9660;</div>
-    <div class="stage"><b>4 · Act &amp; verify with ground truth</b><span>After any fix: confirm with ground truth. A terminal-to-host connection test, a payment attempt run by the merchant, or telemetry showing the next live transaction go through. "It should work now" is not a resolution; a working terminal, observed, is.</span></div>
-    <div class="arrow">&#9660;</div>
-    <div class="stage"><b>5 · Close, or hand off warm</b><span>Close: verified success, summary spoken and logged, ticket written. Hand off: warm transfer with the full context package (see Escalation and handoff) so the merchant never repeats themselves.</span></div>
+    <div class="wfj-stage">
+      <span class="wfj-node"><svg aria-hidden="true" focusable="false" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><polyline points="9 12 11 14 15 10"/></svg></span>
+      <div class="wfj-body">
+        <span class="wfj-k">Step 1</span>
+        <b class="wfj-t">Identify &amp; verify</b>
+        <p class="wfj-p">Identify via caller ID, org number, or terminal ID; authenticate with a real second factor (one-time code or callback to the number on file) since all three identifiers are public or spoofable. Tiered assurance: hardware troubleshooting at low assurance, account data and payment fallbacks (a payment link, where the market supports one) only after authentication. Then: the repeat-caller gate.</p>
+      </div>
+    </div>
+    <div class="wfj-stage">
+      <span class="wfj-node"><svg aria-hidden="true" focusable="false" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><ellipse cx="12" cy="5.5" rx="7" ry="2.5"/><path d="M5 5.5v13c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-13"/><path d="M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/></svg></span>
+      <div class="wfj-body">
+        <span class="wfj-k">Step 2</span>
+        <b class="wfj-t">Compose signals</b>
+        <p class="wfj-p">Fetch telemetry, transaction log, account status, incident status in parallel <i>while</i> asking one high-yield question: "What does the screen show when you try?" Signals + answer feed classification.</p>
+      </div>
+    </div>
+    <div class="wfj-stage wfj-route">
+      <span class="wfj-node"><svg aria-hidden="true" focusable="false" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="12" x2="5" y2="6"/><line x1="12" y1="12" x2="12" y2="4"/><line x1="12" y1="12" x2="19" y2="6"/><polyline points="5 9 5 6 8 6"/><polyline points="10 6 12 4 14 6"/><polyline points="16 6 19 6 19 9"/></svg></span>
+      <div class="wfj-body">
+        <span class="wfj-k">Step 3</span>
+        <b class="wfj-t">Route to a diagnosis branch</b>
+        <p class="wfj-p">The LLM classifies the symptom; deterministic rules pick exactly one of six branches. If confidence is low: one clarifying question, max two loops, then human.</p>
+        <div class="wfj-branches" id="s3-branches">
+          <div class="wfj-branch">
+            <span class="wfj-badge">A</span>
+            <span class="wfj-bic"><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M7 18a4.5 4.5 0 1 1 .8-8.9A6 6 0 0 1 19.5 11 3.7 3.7 0 0 1 18 18H7z"/><line x1="12" y1="10.5" x2="12" y2="13.5"/><circle cx="12" cy="15.8" r="0.9" fill="currentColor" stroke="none"/></svg></span>
+            <div><b>Platform incident</b><p>Tell the merchant it is not their fault, give status and expected resolution, log for callback. Suppress troubleshooting.</p></div>
+          </div>
+          <div class="wfj-branch">
+            <span class="wfj-badge">B</span>
+            <span class="wfj-bic"><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 10a10 10 0 0 1 14 0"/><path d="M8 13.5a6 6 0 0 1 8 0"/><circle cx="12" cy="17.5" r="1.4" fill="currentColor" stroke="none"/></svg></span>
+            <div><b>Local connectivity</b><p>Guided recovery: network check, reboot, SIM or Wi-Fi failover where the hardware supports it. Verify each step against telemetry, not just "did that work?"</p></div>
+          </div>
+          <div class="wfj-branch">
+            <span class="wfj-badge">C</span>
+            <span class="wfj-bic"><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></span>
+            <div><b>Device fault / software</b><p>Remote checks, push update if safe (confirm first). If hardware is dead: replacement flow with a clear timeline.</p></div>
+          </div>
+          <div class="wfj-branch">
+            <span class="wfj-badge">D</span>
+            <span class="wfj-bic"><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5.5" y="11" width="13" height="9" rx="2"/><path d="M9 11V8a3 3 0 0 1 6 0v3"/></svg></span>
+            <div><b>Account-level restriction</b><p>Never speculate about reasons on the call. Acknowledge, state that a specialist must handle it, warm-transfer with priority.</p></div>
+          </div>
+          <div class="wfj-branch">
+            <span class="wfj-badge">E</span>
+            <span class="wfj-bic"><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="6" width="18" height="13" rx="2"/><line x1="3" y1="10.5" x2="21" y2="10.5"/></svg></span>
+            <div><b>Card-side declines</b><p>Show the terminal works: point to decline codes, explain issuer declines, reassure. Evidence, not apology.</p></div>
+          </div>
+          <div class="wfj-branch">
+            <span class="wfj-badge">F</span>
+            <span class="wfj-bic"><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.8.3-.9 1-.9 1.7"/><circle cx="12" cy="16.5" r="0.9" fill="currentColor" stroke="none"/></svg></span>
+            <div><b>Wrong or unclear device</b><p>Disambiguate the device (terminal vs. POS tablet vs. printer). One more signal or question; if still unclear, human.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wfj-stage">
+      <span class="wfj-node"><svg aria-hidden="true" focusable="false" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg></span>
+      <div class="wfj-body">
+        <span class="wfj-k">Step 4</span>
+        <b class="wfj-t">Act &amp; verify with ground truth</b>
+        <p class="wfj-p">After any fix: confirm with ground truth. A terminal-to-host connection test, a payment attempt run by the merchant, or telemetry showing the next live transaction go through. "It should work now" is not a resolution; a working terminal, observed, is.</p>
+      </div>
+    </div>
+    <div class="wfj-stage">
+      <span class="wfj-node"><svg aria-hidden="true" focusable="false" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.3 2.4-5.2 5.5-5.2s5.5 1.9 5.5 5.2"/><polyline points="15 10 17 12 21 8"/></svg></span>
+      <div class="wfj-body">
+        <span class="wfj-k">Step 5</span>
+        <b class="wfj-t">Close, or hand off warm</b>
+        <p class="wfj-p">Close: verified success, summary spoken and logged, ticket written. Hand off: warm transfer with the full context package (see Escalation and handoff) so the merchant never repeats themselves.</p>
+      </div>
+    </div>
   </div>
 
-  <h3 id="s3-path">The canonical decision path, end to end</h3>
-  <p>The flowchart answers <b>"where did the case travel"</b>; the executable decision model's rule trace answers <b>"why"</b>. How to read it: rounded boxes are process steps, diamonds are decisions, cut-corner boxes are hard gates that outrank diagnosis, and slanted boxes are warm handoffs. Chips at the right are diagnosis branches reached directly from a gate; the dashed readouts are state changes, not routes. Terminology matches the decision model exactly, and a full text version follows below.</p>
+  <h3 id="s3-path">The full decision path, end to end</h3>
+  <p>The flowchart answers <b>"where did the case travel"</b>; the executable decision model's rule trace answers <b>"why"</b>. How to read it: rounded boxes are process steps, diamonds are decisions, dark cut-corner boxes are hard gates that outrank diagnosis, and slanted boxes are warm handoffs. Green chips at the right are diagnosis branches reached directly from a gate; dashed notes are state changes, not routes. Terminology matches the decision model exactly, and a full text version follows below.</p>
   <div class="fc-panel">
     <div class="fc-head">
       <svg aria-hidden="true" focusable="false" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="12" x2="5" y2="6"/><line x1="12" y1="12" x2="19" y2="6"/><polyline points="5 9 5 6 8 6"/><polyline points="16 6 19 6 19 9"/></svg>
-      Decision path · canonical route
+      Decision path · call opened to case closed
       <span>same terminology as the live model</span>
     </div>
     <div class="fc-body">
-      <svg viewBox="0 0 720 1060" role="img" aria-label="Flowchart of the canonical decision path from call begins to close or warm handoff; a full text version follows below" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox="0 0 720 1060" role="img" aria-label="Flowchart of the full decision path from call begins to close or warm handoff; a full text version follows below" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <marker id="fcxA" viewBox="0 0 10 10" refX="7.5" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#9fe870"/></marker>
-          <marker id="fcxAb" viewBox="0 0 10 10" refX="7.5" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#9fd0f0"/></marker>
+          <marker id="fcxA" viewBox="0 0 10 10" refX="7.5" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#101210"/></marker>
         </defs>
 
         <!-- trunk segments (drawn first, nodes paint on top) -->
-        <g stroke="rgba(159,232,112,0.45)" stroke-width="1.4" fill="none">
+        <g stroke="rgba(16,18,16,0.45)" stroke-width="1.3" fill="none">
           <line x1="260" y1="50" x2="260" y2="64"/>
           <line x1="260" y1="112" x2="260" y2="126"/>
           <line x1="260" y1="180" x2="260" y2="194"/>
@@ -177,84 +236,85 @@
           <line x1="260" y1="580" x2="260" y2="594"/>
           <line x1="260" y1="976" x2="260" y2="998"/>
         </g>
+
         <!-- call begins -->
-        <rect x="180" y="16" width="160" height="34" rx="17" fill="#101211" stroke="rgba(159,232,112,0.7)" stroke-width="1.4"/>
+        <rect x="180" y="16" width="160" height="34" rx="17" fill="#101210"/>
         <text x="260" y="37" text-anchor="middle" font-family="Roboto Mono" font-size="9" font-weight="700" letter-spacing="2" fill="#9fe870">CALL BEGINS</text>
 
         <!-- stabilize -->
-        <rect x="148" y="64" width="224" height="48" rx="10" fill="#171b12" stroke="rgba(159,232,112,0.4)" stroke-width="1.2"/>
-        <text x="260" y="84" text-anchor="middle" font-family="Mulish" font-size="10" font-weight="800" fill="#ffffff">Stabilize</text>
-        <text x="260" y="99" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#a9aba7">calm the urgency, set expectations</text>
+        <rect x="148" y="64" width="224" height="48" rx="10" fill="#f7f7f5" stroke="#d9d9d6" stroke-width="1.2"/>
+        <text x="260" y="84" text-anchor="middle" font-family="Mulish" font-size="10" font-weight="800" fill="#101210">Stabilize</text>
+        <text x="260" y="99" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">calm the urgency, set expectations</text>
 
         <!-- verify caller (hard gate) -->
-        <polygon points="160,126 360,126 372,138 372,168 360,180 160,180 148,168 148,138" fill="#1b2412" stroke="rgba(159,232,112,0.75)" stroke-width="1.3"/>
+        <polygon points="160,126 360,126 372,138 372,168 360,180 160,180 148,168 148,138" fill="#101210"/>
         <text x="260" y="148" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#ffffff">Hard gate · Verify caller</text>
-        <text x="260" y="164" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#d6d6d3">tiered assurance before any account data</text>
-        <line x1="372" y1="153" x2="398" y2="153" stroke="#f0c66a" stroke-width="1.1" stroke-dasharray="3 4"/>
-        <circle cx="403" cy="153" r="2.4" fill="#f0c66a"/>
-        <text x="412" y="149" font-family="Roboto Mono" font-size="7" fill="#f0c66a">verification failed &#8594; needs clarification</text>
-        <text x="412" y="161" font-family="Roboto Mono" font-size="7" fill="rgba(240,198,106,0.7)">provisional route only · account actions locked</text>
+        <text x="260" y="164" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#b9bab6">tiered assurance before any account data</text>
+        <line x1="372" y1="153" x2="398" y2="153" stroke="#b8863f" stroke-width="1.1" stroke-dasharray="3 4"/>
+        <circle cx="403" cy="153" r="2.4" fill="#b8863f"/>
+        <text x="412" y="149" font-family="Roboto Mono" font-size="7" fill="#8a6530">verification failed &#8594; needs clarification</text>
+        <text x="412" y="161" font-family="Roboto Mono" font-size="7" fill="#a1803f">provisional route only · account actions locked</text>
 
         <!-- human gates -->
-        <polygon points="160,194 360,194 372,206 372,242 360,254 160,254 148,242 148,206" fill="#1b2412" stroke="rgba(159,232,112,0.75)" stroke-width="1.3"/>
+        <polygon points="160,194 360,194 372,206 372,242 360,254 160,254 148,242 148,206" fill="#101210"/>
         <text x="260" y="215" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#ffffff">Hard gates · Human first</text>
-        <text x="260" y="231" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#d6d6d3">human requested: honored on the first ask</text>
-        <text x="260" y="243" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#d6d6d3">repeat contact, prior fix unverified</text>
-        <line x1="372" y1="224" x2="462" y2="224" stroke="#9fd0f0" stroke-width="1.2" marker-end="url(#fcxAb)"/>
-        <polygon points="480,206 690,206 678,242 468,242" fill="#10161a" stroke="#9fd0f0" stroke-width="1.3"/>
-        <text x="579" y="228" text-anchor="middle" font-family="Mulish" font-size="8.8" font-weight="800" fill="#9fd0f0">Warm handoff</text>
+        <text x="260" y="231" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#b9bab6">human requested: honored on the first ask</text>
+        <text x="260" y="243" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#b9bab6">repeat contact, prior fix unverified</text>
+        <line x1="372" y1="224" x2="462" y2="224" stroke="rgba(16,18,16,0.55)" stroke-width="1.2" marker-end="url(#fcxA)"/>
+        <polygon points="480,206 690,206 678,242 468,242" fill="#f0f0ed" stroke="#101210" stroke-width="1.2"/>
+        <text x="579" y="228" text-anchor="middle" font-family="Mulish" font-size="8.8" font-weight="800" fill="#101210">Warm handoff</text>
 
         <!-- signal availability -->
-        <polygon points="260,268 380,303 260,338 140,303" fill="#101211" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
-        <text x="260" y="300" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#ffffff">Signal availability</text>
-        <text x="260" y="314" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#a9aba7">signal APIs reachable?</text>
-        <line x1="380" y1="303" x2="398" y2="303" stroke="#f0c66a" stroke-width="1.1" stroke-dasharray="3 4"/>
-        <circle cx="403" cy="303" r="2.4" fill="#f0c66a"/>
-        <text x="412" y="299" font-family="Roboto Mono" font-size="7" fill="#f0c66a">unreachable &#8594; degraded mode</text>
-        <text x="412" y="311" font-family="Roboto Mono" font-size="7" fill="rgba(240,198,106,0.7)">symptom-only diagnosis · reduced autonomy</text>
+        <polygon points="260,268 380,303 260,338 140,303" fill="#ffffff" stroke="#101210" stroke-width="1.2"/>
+        <text x="260" y="300" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#101210">Signal availability</text>
+        <text x="260" y="314" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">signal APIs reachable?</text>
+        <line x1="380" y1="303" x2="398" y2="303" stroke="#b8863f" stroke-width="1.1" stroke-dasharray="3 4"/>
+        <circle cx="403" cy="303" r="2.4" fill="#b8863f"/>
+        <text x="412" y="299" font-family="Roboto Mono" font-size="7" fill="#8a6530">unreachable &#8594; degraded mode</text>
+        <text x="412" y="311" font-family="Roboto Mono" font-size="7" fill="#a1803f">symptom-only diagnosis · reduced autonomy</text>
 
         <!-- payment-availability blockers -->
-        <polygon points="160,352 360,352 372,364 372,400 360,412 160,412 148,400 148,364" fill="#1b2412" stroke="rgba(159,232,112,0.75)" stroke-width="1.3"/>
+        <polygon points="160,352 360,352 372,364 372,400 360,412 160,412 148,400 148,364" fill="#101210"/>
         <text x="260" y="371" text-anchor="middle" font-family="Mulish" font-size="9" font-weight="800" fill="#ffffff">Hard gate · Payment-availability blockers</text>
-        <text x="260" y="388" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#d6d6d3">payment acceptance restricted or blocked</text>
-        <text x="260" y="400" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#d6d6d3">outranks any technical fault</text>
-        <line x1="372" y1="382" x2="462" y2="382" stroke="rgba(159,232,112,0.8)" stroke-width="1.2" marker-end="url(#fcxA)"/>
-        <rect x="468" y="356" width="222" height="52" rx="10" fill="#14170f" stroke="rgba(159,232,112,0.65)" stroke-width="1.2"/>
-        <text x="579" y="377" text-anchor="middle" font-family="Mulish" font-size="8.4" font-weight="800" fill="#9fe870">Branch D · Account-level restriction</text>
-        <text x="579" y="393" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#a9aba7">specialist warm handoff · reasons never on the call</text>
+        <text x="260" y="388" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#b9bab6">payment acceptance restricted or blocked</text>
+        <text x="260" y="400" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#b9bab6">outranks any technical fault</text>
+        <line x1="372" y1="382" x2="462" y2="382" stroke="rgba(16,18,16,0.55)" stroke-width="1.2" marker-end="url(#fcxA)"/>
+        <rect x="468" y="356" width="222" height="52" rx="10" fill="rgba(159,232,112,0.18)" stroke="#101210" stroke-width="1.1"/>
+        <text x="579" y="377" text-anchor="middle" font-family="Mulish" font-size="8.4" font-weight="800" fill="#101210">Branch D · Account-level restriction</text>
+        <text x="579" y="393" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#6b6c69">specialist warm handoff · reasons never on the call</text>
 
         <!-- incident status -->
-        <polygon points="260,426 380,461 260,496 140,461" fill="#101211" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
-        <text x="260" y="458" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#ffffff">Incident status</text>
-        <text x="260" y="472" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#a9aba7">incident confirmed? symptom spiking?</text>
-        <line x1="380" y1="461" x2="462" y2="450" stroke="rgba(159,232,112,0.8)" stroke-width="1.2" marker-end="url(#fcxA)"/>
-        <rect x="468" y="428" width="222" height="44" rx="10" fill="#14170f" stroke="rgba(159,232,112,0.65)" stroke-width="1.2"/>
-        <text x="579" y="446" text-anchor="middle" font-family="Mulish" font-size="8.4" font-weight="800" fill="#9fe870">Branch A · Platform incident</text>
-        <text x="579" y="461" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#a9aba7">broadcast mode when a spike joins a confirmed incident</text>
-        <circle cx="473" cy="486" r="2.4" fill="#f0c66a"/>
-        <text x="482" y="490" font-family="Roboto Mono" font-size="7" fill="#f0c66a">spike only &#8594; suspected incident · conservative diagnosis</text>
+        <polygon points="260,426 380,461 260,496 140,461" fill="#ffffff" stroke="#101210" stroke-width="1.2"/>
+        <text x="260" y="458" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#101210">Incident status</text>
+        <text x="260" y="472" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">incident confirmed? symptom spiking?</text>
+        <line x1="380" y1="461" x2="462" y2="450" stroke="rgba(16,18,16,0.55)" stroke-width="1.2" marker-end="url(#fcxA)"/>
+        <rect x="468" y="428" width="222" height="44" rx="10" fill="rgba(159,232,112,0.18)" stroke="#101210" stroke-width="1.1"/>
+        <text x="579" y="446" text-anchor="middle" font-family="Mulish" font-size="8.4" font-weight="800" fill="#101210">Branch A · Platform incident</text>
+        <text x="579" y="461" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#6b6c69">broadcast mode when a spike joins a confirmed incident</text>
+        <circle cx="473" cy="486" r="2.4" fill="#b8863f"/>
+        <text x="482" y="490" font-family="Roboto Mono" font-size="7" fill="#8a6530">spike only &#8594; suspected incident · conservative diagnosis</text>
 
         <!-- device identification -->
-        <polygon points="260,510 380,545 260,580 140,545" fill="#101211" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
-        <text x="260" y="542" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#ffffff">Device identification</text>
-        <text x="260" y="556" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#a9aba7">terminal? POS tablet? printer? unclear?</text>
-        <line x1="380" y1="545" x2="462" y2="534" stroke="rgba(159,232,112,0.8)" stroke-width="1.2" marker-end="url(#fcxA)"/>
-        <rect x="468" y="514" width="222" height="40" rx="10" fill="#14170f" stroke="rgba(159,232,112,0.65)" stroke-width="1.2"/>
-        <text x="579" y="538" text-anchor="middle" font-family="Mulish" font-size="8.4" font-weight="800" fill="#9fe870">Branch F · Wrong or unclear device</text>
-        <circle cx="473" cy="568" r="2.4" fill="#f0c66a"/>
-        <text x="482" y="572" font-family="Roboto Mono" font-size="7" fill="#f0c66a">unclear after two attempts &#8594; warm handoff</text>
+        <polygon points="260,510 380,545 260,580 140,545" fill="#ffffff" stroke="#101210" stroke-width="1.2"/>
+        <text x="260" y="542" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#101210">Device identification</text>
+        <text x="260" y="556" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">terminal? POS tablet? printer? unclear?</text>
+        <line x1="380" y1="545" x2="462" y2="534" stroke="rgba(16,18,16,0.55)" stroke-width="1.2" marker-end="url(#fcxA)"/>
+        <rect x="468" y="514" width="222" height="40" rx="10" fill="rgba(159,232,112,0.18)" stroke="#101210" stroke-width="1.1"/>
+        <text x="579" y="538" text-anchor="middle" font-family="Mulish" font-size="8.4" font-weight="800" fill="#101210">Branch F · Wrong or unclear device</text>
+        <circle cx="473" cy="568" r="2.4" fill="#b8863f"/>
+        <text x="482" y="572" font-family="Roboto Mono" font-size="7" fill="#8a6530">unclear after two attempts &#8594; warm handoff</text>
 
         <!-- technical diagnosis -->
-        <rect x="148" y="594" width="224" height="50" rx="10" fill="#171b12" stroke="rgba(159,232,112,0.4)" stroke-width="1.2"/>
-        <text x="260" y="614" text-anchor="middle" font-family="Mulish" font-size="10" font-weight="800" fill="#ffffff">Technical diagnosis</text>
-        <text x="260" y="629" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#a9aba7">compose the signals with the reported symptom</text>
-        <line x1="372" y1="619" x2="398" y2="619" stroke="#f0c66a" stroke-width="1.1" stroke-dasharray="3 4"/>
-        <circle cx="403" cy="619" r="2.4" fill="#f0c66a"/>
-        <text x="412" y="615" font-family="Roboto Mono" font-size="7" fill="#f0c66a">no decisive evidence &#8594; needs clarification</text>
-        <text x="412" y="627" font-family="Roboto Mono" font-size="7" fill="rgba(240,198,106,0.7)">provisional route + required next action</text>
+        <rect x="148" y="594" width="224" height="50" rx="10" fill="#f7f7f5" stroke="#d9d9d6" stroke-width="1.2"/>
+        <text x="260" y="614" text-anchor="middle" font-family="Mulish" font-size="10" font-weight="800" fill="#101210">Technical diagnosis</text>
+        <text x="260" y="629" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">compose the signals with the reported symptom</text>
+        <line x1="372" y1="619" x2="398" y2="619" stroke="#b8863f" stroke-width="1.1" stroke-dasharray="3 4"/>
+        <circle cx="403" cy="619" r="2.4" fill="#b8863f"/>
+        <text x="412" y="615" font-family="Roboto Mono" font-size="7" fill="#8a6530">no decisive evidence &#8594; needs clarification</text>
+        <text x="412" y="627" font-family="Roboto Mono" font-size="7" fill="#a1803f">provisional route + required next action</text>
 
         <!-- branch fan -->
-        <g stroke="rgba(159,232,112,0.3)" stroke-width="1.1" fill="none">
+        <g stroke="rgba(16,18,16,0.3)" stroke-width="1" fill="none">
           <line x1="260" y1="644" x2="70" y2="688"/>
           <line x1="260" y1="644" x2="186" y2="688"/>
           <line x1="260" y1="644" x2="302" y2="688"/>
@@ -263,32 +323,32 @@
           <line x1="260" y1="644" x2="650" y2="688"/>
         </g>
         <g>
-          <circle cx="70" cy="707" r="17" fill="#14170f" stroke="rgba(159,232,112,0.7)" stroke-width="1.3"/>
+          <circle cx="70" cy="707" r="17" fill="#101210"/>
           <text x="70" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#9fe870">A</text>
-          <text x="70" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#a9aba7">Platform</text>
-          <text x="70" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#a9aba7">incident</text>
-          <circle cx="186" cy="707" r="17" fill="#14170f" stroke="rgba(159,232,112,0.7)" stroke-width="1.3"/>
+          <text x="70" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">Platform</text>
+          <text x="70" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">incident</text>
+          <circle cx="186" cy="707" r="17" fill="#101210"/>
           <text x="186" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#9fe870">B</text>
-          <text x="186" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#a9aba7">Local</text>
-          <text x="186" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#a9aba7">connectivity</text>
-          <circle cx="302" cy="707" r="17" fill="#14170f" stroke="rgba(159,232,112,0.7)" stroke-width="1.3"/>
+          <text x="186" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">Local</text>
+          <text x="186" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">connectivity</text>
+          <circle cx="302" cy="707" r="17" fill="#101210"/>
           <text x="302" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#9fe870">C</text>
-          <text x="302" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#a9aba7">Device fault /</text>
-          <text x="302" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#a9aba7">software</text>
-          <circle cx="418" cy="707" r="17" fill="#14170f" stroke="rgba(159,232,112,0.7)" stroke-width="1.3"/>
+          <text x="302" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">Device fault /</text>
+          <text x="302" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">software</text>
+          <circle cx="418" cy="707" r="17" fill="#101210"/>
           <text x="418" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#9fe870">D</text>
-          <text x="418" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#a9aba7">Account-level</text>
-          <text x="418" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#a9aba7">restriction</text>
-          <circle cx="534" cy="707" r="17" fill="#14170f" stroke="rgba(159,232,112,0.7)" stroke-width="1.3"/>
+          <text x="418" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">Account-level</text>
+          <text x="418" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">restriction</text>
+          <circle cx="534" cy="707" r="17" fill="#101210"/>
           <text x="534" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#9fe870">E</text>
-          <text x="534" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#a9aba7">Card-side</text>
-          <text x="534" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#a9aba7">declines</text>
-          <circle cx="650" cy="707" r="17" fill="#14170f" stroke="rgba(159,232,112,0.7)" stroke-width="1.3"/>
+          <text x="534" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">Card-side</text>
+          <text x="534" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">declines</text>
+          <circle cx="650" cy="707" r="17" fill="#101210"/>
           <text x="650" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#9fe870">F</text>
-          <text x="650" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#a9aba7">Wrong or</text>
-          <text x="650" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#a9aba7">unclear device</text>
+          <text x="650" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">Wrong or</text>
+          <text x="650" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">unclear device</text>
         </g>
-        <g stroke="rgba(159,232,112,0.3)" stroke-width="1" fill="none">
+        <g stroke="rgba(16,18,16,0.2)" stroke-width="1" fill="none">
           <line x1="70" y1="754" x2="252" y2="780"/>
           <line x1="186" y1="754" x2="256" y2="780"/>
           <line x1="302" y1="754" x2="262" y2="780"/>
@@ -298,31 +358,31 @@
         </g>
 
         <!-- permission overlays -->
-        <rect x="148" y="782" width="224" height="50" rx="10" fill="#171b12" stroke="rgba(159,232,112,0.4)" stroke-width="1.2"/>
-        <text x="260" y="802" text-anchor="middle" font-family="Mulish" font-size="10" font-weight="800" fill="#ffffff">Permission overlays</text>
-        <text x="260" y="817" text-anchor="middle" font-family="Roboto Mono" font-size="7" fill="#a9aba7">autonomous · confirm first · locked · never</text>
-        <line x1="260" y1="832" x2="260" y2="846" stroke="rgba(159,232,112,0.45)" stroke-width="1.4"/>
+        <rect x="148" y="782" width="224" height="50" rx="10" fill="#f7f7f5" stroke="#d9d9d6" stroke-width="1.2"/>
+        <text x="260" y="802" text-anchor="middle" font-family="Mulish" font-size="10" font-weight="800" fill="#101210">Permission overlays</text>
+        <text x="260" y="817" text-anchor="middle" font-family="Roboto Mono" font-size="7" fill="#6b6c69">autonomous · confirm first · locked · never</text>
+        <line x1="260" y1="832" x2="260" y2="846" stroke="rgba(16,18,16,0.45)" stroke-width="1.3"/>
 
         <!-- act -->
-        <rect x="148" y="848" width="224" height="44" rx="10" fill="#171b12" stroke="rgba(159,232,112,0.4)" stroke-width="1.2"/>
-        <text x="260" y="866" text-anchor="middle" font-family="Mulish" font-size="10" font-weight="800" fill="#ffffff">Act</text>
-        <text x="260" y="880" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#a9aba7">inside the permission gate, step by step</text>
-        <line x1="260" y1="892" x2="260" y2="906" stroke="rgba(159,232,112,0.45)" stroke-width="1.4"/>
+        <rect x="148" y="848" width="224" height="44" rx="10" fill="#f7f7f5" stroke="#d9d9d6" stroke-width="1.2"/>
+        <text x="260" y="866" text-anchor="middle" font-family="Mulish" font-size="10" font-weight="800" fill="#101210">Act</text>
+        <text x="260" y="880" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">inside the permission gate, step by step</text>
+        <line x1="260" y1="892" x2="260" y2="906" stroke="rgba(16,18,16,0.45)" stroke-width="1.3"/>
 
         <!-- outcome verification -->
-        <polygon points="260,908 380,942 260,976 140,942" fill="#101211" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
-        <text x="260" y="939" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#ffffff">Outcome verification</text>
-        <text x="260" y="953" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#a9aba7">verified resolution in telemetry?</text>
-        <line x1="380" y1="942" x2="462" y2="942" stroke="#9fd0f0" stroke-width="1.2" marker-end="url(#fcxAb)"/>
-        <text x="422" y="933" text-anchor="middle" font-family="Roboto Mono" font-size="6.6" fill="#9fd0f0">two failed fix cycles</text>
-        <text x="286" y="992" font-family="Roboto Mono" font-size="6.6" fill="#9fe870">verified</text>
+        <polygon points="260,908 380,942 260,976 140,942" fill="#ffffff" stroke="#101210" stroke-width="1.2"/>
+        <text x="260" y="939" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#101210">Outcome verification</text>
+        <text x="260" y="953" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">verified resolution in telemetry?</text>
+        <line x1="380" y1="942" x2="462" y2="942" stroke="rgba(16,18,16,0.55)" stroke-width="1.2" marker-end="url(#fcxA)"/>
+        <text x="422" y="933" text-anchor="middle" font-family="Roboto Mono" font-size="6.6" fill="#6b6c69">two failed fix cycles</text>
+        <text x="286" y="992" font-family="Roboto Mono" font-size="6.6" fill="#6b6c69">verified</text>
 
         <!-- terminals -->
         <rect x="140" y="1002" width="240" height="40" rx="20" fill="#9fe870"/>
         <text x="260" y="1026" text-anchor="middle" font-family="Roboto Mono" font-size="8.5" font-weight="700" letter-spacing="1.5" fill="#101210">CLOSE · VERIFIED RESOLUTION</text>
-        <polygon points="480,916 690,916 678,968 468,968" fill="#10161a" stroke="#9fd0f0" stroke-width="1.3"/>
-        <text x="579" y="938" text-anchor="middle" font-family="Mulish" font-size="8.8" font-weight="800" fill="#9fd0f0">Warm handoff · Human specialist</text>
-        <text x="579" y="954" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#a9aba7">full context package · the merchant never repeats themselves</text>
+        <polygon points="480,916 690,916 678,968 468,968" fill="#f0f0ed" stroke="#101210" stroke-width="1.2"/>
+        <text x="579" y="938" text-anchor="middle" font-family="Mulish" font-size="8.8" font-weight="800" fill="#101210">Warm handoff · Human specialist</text>
+        <text x="579" y="954" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#6b6c69">full context package · the merchant never repeats themselves</text>
       </svg>
     </div>
   </div>
@@ -437,7 +497,7 @@
   </div>
 
   <h2 id="s7"><span class="secnum">7</span>Localization: one workflow, six market overlays</h2>
-  <p>Denmark, Finland, France, Germany, Italy, and the UK differ in language, product suite, compliance, and self-serve surfaces. The design principle: <b>localize behavior, not logic.</b> One canonical workflow, with a per-market overlay that parameterizes it. Six forked workflows would drift apart within a quarter; a shared flow with overlays keeps every improvement global by default.</p>
+  <p>Denmark, Finland, France, Germany, Italy, and the UK differ in language, product suite, compliance, and self-serve surfaces. The design principle: <b>localize behavior, not logic.</b> One shared workflow, with a per-market overlay that parameterizes it. Six forked workflows would drift apart within a quarter; a shared flow with overlays keeps every improvement global by default.</p>
   <div class="table-scroll">
     <table>
       <caption class="vh">Market overlay dimensions</caption>
@@ -449,7 +509,7 @@
       <tr><td>Escalation targets</td><td>Local queue hours, languages, and specialist coverage; after-hours behavior configured per market.</td></tr>
     </table>
   </div>
-  <p>Rollout follows the same shape: prove the canonical workflow in one market, then add overlays one market at a time, with the market's support leads reviewing scripts before go-live.</p>
+  <p>Rollout follows the same shape: prove the shared workflow in one market, then add overlays one market at a time, with the market's support leads reviewing scripts before go-live.</p>
 
   <h2 id="s8"><span class="secnum">8</span>Stress-testing before a live merchant hears it</h2>
   <div class="table-scroll">
@@ -511,7 +571,7 @@
     <div class="principle"><b>Compose signals; don't recite FAQs.</b> If a system can answer it, never ask the merchant.</div>
     <div class="principle"><b>Verify with ground truth.</b> A resolution is a processed payment, not a polite goodbye.</div>
     <div class="principle"><b>The human path is a feature.</b> Escalation is designed with the same care as automation, and asking for a human always works the first time.</div>
-    <div class="principle"><b>Localize behavior, not logic.</b> One canonical flow, market overlays on top.</div>
+    <div class="principle"><b>Localize behavior, not logic.</b> One shared flow, market overlays on top.</div>
     <div class="principle"><b>Every production failure becomes a permanent test.</b> The edge-case library only grows.</div>
   </div>
 
