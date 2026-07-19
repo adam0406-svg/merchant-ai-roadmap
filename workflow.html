@@ -158,6 +158,8 @@
         <span class="wfj-k">Step 3</span>
         <b class="wfj-t">Route to a diagnosis branch</b>
         <p class="wfj-p">The LLM classifies the symptom; deterministic rules pick exactly one of six branches. If confidence is low: one clarifying question, max two loops, then human.</p>
+        <div class="wfj-fan">
+        <span class="wfj-fan-l">The call takes exactly one of six branches</span>
         <div class="wfj-branches" id="s3-branches">
           <div class="wfj-branch">
             <span class="wfj-badge">A</span>
@@ -189,6 +191,7 @@
             <span class="wfj-bic"><svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.8.3-.9 1-.9 1.7"/><circle cx="12" cy="16.5" r="0.9" fill="currentColor" stroke="none"/></svg></span>
             <div><b>Wrong or unclear device</b><p>Disambiguate the device (terminal vs. POS tablet vs. printer). One more signal or question; if still unclear, human.</p></div>
           </div>
+        </div>
         </div>
       </div>
     </div>
@@ -239,7 +242,7 @@
 
         <!-- call begins -->
         <rect x="180" y="16" width="160" height="34" rx="17" fill="#101210"/>
-        <text x="260" y="37" text-anchor="middle" font-family="Roboto Mono" font-size="9" font-weight="700" letter-spacing="2" fill="#9fe870">CALL BEGINS</text>
+        <text x="260" y="37" text-anchor="middle" font-family="Roboto Mono" font-size="9" font-weight="700" letter-spacing="2" fill="#ffffff">CALL BEGINS</text>
 
         <!-- stabilize -->
         <rect x="148" y="64" width="224" height="48" rx="10" fill="#f7f7f5" stroke="#d9d9d6" stroke-width="1.2"/>
@@ -279,7 +282,7 @@
         <text x="260" y="388" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#b9bab6">payment acceptance restricted or blocked</text>
         <text x="260" y="400" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#b9bab6">outranks any technical fault</text>
         <line x1="372" y1="382" x2="462" y2="382" stroke="rgba(16,18,16,0.55)" stroke-width="1.2" marker-end="url(#fcxA)"/>
-        <rect x="468" y="356" width="222" height="52" rx="10" fill="rgba(159,232,112,0.18)" stroke="#101210" stroke-width="1.1"/>
+        <rect x="468" y="356" width="222" height="52" rx="10" fill="rgba(159,232,112,0.13)" stroke="#101210" stroke-width="1.1"/>
         <text x="579" y="377" text-anchor="middle" font-family="Mulish" font-size="8.4" font-weight="800" fill="#101210">Branch D · Account-level restriction</text>
         <text x="579" y="393" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#6b6c69">specialist warm handoff · reasons never on the call</text>
 
@@ -288,7 +291,7 @@
         <text x="260" y="458" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#101210">Incident status</text>
         <text x="260" y="472" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">incident confirmed? symptom spiking?</text>
         <line x1="380" y1="461" x2="462" y2="450" stroke="rgba(16,18,16,0.55)" stroke-width="1.2" marker-end="url(#fcxA)"/>
-        <rect x="468" y="428" width="222" height="44" rx="10" fill="rgba(159,232,112,0.18)" stroke="#101210" stroke-width="1.1"/>
+        <rect x="468" y="428" width="222" height="44" rx="10" fill="rgba(159,232,112,0.13)" stroke="#101210" stroke-width="1.1"/>
         <text x="579" y="446" text-anchor="middle" font-family="Mulish" font-size="8.4" font-weight="800" fill="#101210">Branch A · Platform incident</text>
         <text x="579" y="461" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#6b6c69">broadcast mode when a spike joins a confirmed incident</text>
         <circle cx="473" cy="486" r="2.4" fill="#b8863f"/>
@@ -299,7 +302,7 @@
         <text x="260" y="542" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#101210">Device identification</text>
         <text x="260" y="556" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">terminal? POS tablet? printer? unclear?</text>
         <line x1="380" y1="545" x2="462" y2="534" stroke="rgba(16,18,16,0.55)" stroke-width="1.2" marker-end="url(#fcxA)"/>
-        <rect x="468" y="514" width="222" height="40" rx="10" fill="rgba(159,232,112,0.18)" stroke="#101210" stroke-width="1.1"/>
+        <rect x="468" y="514" width="222" height="40" rx="10" fill="rgba(159,232,112,0.13)" stroke="#101210" stroke-width="1.1"/>
         <text x="579" y="538" text-anchor="middle" font-family="Mulish" font-size="8.4" font-weight="800" fill="#101210">Branch F · Wrong or unclear device</text>
         <circle cx="473" cy="568" r="2.4" fill="#b8863f"/>
         <text x="482" y="572" font-family="Roboto Mono" font-size="7" fill="#8a6530">unclear after two attempts &#8594; warm handoff</text>
@@ -324,27 +327,27 @@
         </g>
         <g>
           <circle cx="70" cy="707" r="17" fill="#101210"/>
-          <text x="70" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#9fe870">A</text>
+          <text x="70" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#ffffff">A</text>
           <text x="70" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">Platform</text>
           <text x="70" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">incident</text>
           <circle cx="186" cy="707" r="17" fill="#101210"/>
-          <text x="186" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#9fe870">B</text>
+          <text x="186" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#ffffff">B</text>
           <text x="186" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">Local</text>
           <text x="186" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">connectivity</text>
           <circle cx="302" cy="707" r="17" fill="#101210"/>
-          <text x="302" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#9fe870">C</text>
+          <text x="302" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#ffffff">C</text>
           <text x="302" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">Device fault /</text>
           <text x="302" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">software</text>
           <circle cx="418" cy="707" r="17" fill="#101210"/>
-          <text x="418" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#9fe870">D</text>
+          <text x="418" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#ffffff">D</text>
           <text x="418" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">Account-level</text>
           <text x="418" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">restriction</text>
           <circle cx="534" cy="707" r="17" fill="#101210"/>
-          <text x="534" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#9fe870">E</text>
+          <text x="534" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#ffffff">E</text>
           <text x="534" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">Card-side</text>
           <text x="534" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">declines</text>
           <circle cx="650" cy="707" r="17" fill="#101210"/>
-          <text x="650" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#9fe870">F</text>
+          <text x="650" y="712" text-anchor="middle" font-family="Roboto Mono" font-size="12" font-weight="700" fill="#ffffff">F</text>
           <text x="650" y="737" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">Wrong or</text>
           <text x="650" y="747" text-anchor="middle" font-family="Mulish" font-size="6.8" fill="#6b6c69">unclear device</text>
         </g>
@@ -378,8 +381,8 @@
         <text x="286" y="992" font-family="Roboto Mono" font-size="6.6" fill="#6b6c69">verified</text>
 
         <!-- terminals -->
-        <rect x="140" y="1002" width="240" height="40" rx="20" fill="#9fe870"/>
-        <text x="260" y="1026" text-anchor="middle" font-family="Roboto Mono" font-size="8.5" font-weight="700" letter-spacing="1.5" fill="#101210">CLOSE · VERIFIED RESOLUTION</text>
+        <rect x="140" y="1002" width="240" height="40" rx="20" fill="#101210"/>
+        <text x="260" y="1026" text-anchor="middle" font-family="Roboto Mono" font-size="8.5" font-weight="700" letter-spacing="1.5" fill="#ffffff">CLOSE · VERIFIED RESOLUTION</text>
         <polygon points="480,916 690,916 678,968 468,968" fill="#f0f0ed" stroke="#101210" stroke-width="1.2"/>
         <text x="579" y="938" text-anchor="middle" font-family="Mulish" font-size="8.8" font-weight="800" fill="#101210">Warm handoff · Human specialist</text>
         <text x="579" y="954" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#6b6c69">full context package · the merchant never repeats themselves</text>
