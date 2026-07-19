@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Full workflow specification · Designing for resolution, not deflection</title>
 <meta name="description" content="An agentic workflow design for a merchant-facing Voice AI, worked end to end: signal map, six branches, permissions, 20 edge cases, handoff spec, localization, test plan, metrics, assumptions register.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23101210'/%3E%3Ccircle cx='12' cy='12' r='5' fill='%239fe870'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23101210'/%3E%3Ccircle cx='12' cy='12' r='5' fill='%23ffffff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -282,7 +282,7 @@
         <text x="260" y="388" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#b9bab6">payment acceptance restricted or blocked</text>
         <text x="260" y="400" text-anchor="middle" font-family="Mulish" font-size="7.4" fill="#b9bab6">outranks any technical fault</text>
         <line x1="372" y1="382" x2="462" y2="382" stroke="rgba(16,18,16,0.55)" stroke-width="1.2" marker-end="url(#fcxA)"/>
-        <rect x="468" y="356" width="222" height="52" rx="10" fill="rgba(159,232,112,0.13)" stroke="#101210" stroke-width="1.1"/>
+        <rect x="468" y="356" width="222" height="52" rx="10" fill="#f0f0ed" stroke="#101210" stroke-width="1.1"/>
         <text x="579" y="377" text-anchor="middle" font-family="Mulish" font-size="8.4" font-weight="800" fill="#101210">Branch D · Account-level restriction</text>
         <text x="579" y="393" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#6b6c69">specialist warm handoff · reasons never on the call</text>
 
@@ -291,7 +291,7 @@
         <text x="260" y="458" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#101210">Incident status</text>
         <text x="260" y="472" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">incident confirmed? symptom spiking?</text>
         <line x1="380" y1="461" x2="462" y2="450" stroke="rgba(16,18,16,0.55)" stroke-width="1.2" marker-end="url(#fcxA)"/>
-        <rect x="468" y="428" width="222" height="44" rx="10" fill="rgba(159,232,112,0.13)" stroke="#101210" stroke-width="1.1"/>
+        <rect x="468" y="428" width="222" height="44" rx="10" fill="#f0f0ed" stroke="#101210" stroke-width="1.1"/>
         <text x="579" y="446" text-anchor="middle" font-family="Mulish" font-size="8.4" font-weight="800" fill="#101210">Branch A · Platform incident</text>
         <text x="579" y="461" text-anchor="middle" font-family="Mulish" font-size="7.2" fill="#6b6c69">broadcast mode when a spike joins a confirmed incident</text>
         <circle cx="473" cy="486" r="2.4" fill="#b8863f"/>
@@ -302,7 +302,7 @@
         <text x="260" y="542" text-anchor="middle" font-family="Mulish" font-size="9.5" font-weight="800" fill="#101210">Device identification</text>
         <text x="260" y="556" text-anchor="middle" font-family="Mulish" font-size="7.5" fill="#6b6c69">terminal? POS tablet? printer? unclear?</text>
         <line x1="380" y1="545" x2="462" y2="534" stroke="rgba(16,18,16,0.55)" stroke-width="1.2" marker-end="url(#fcxA)"/>
-        <rect x="468" y="514" width="222" height="40" rx="10" fill="rgba(159,232,112,0.13)" stroke="#101210" stroke-width="1.1"/>
+        <rect x="468" y="514" width="222" height="40" rx="10" fill="#f0f0ed" stroke="#101210" stroke-width="1.1"/>
         <text x="579" y="538" text-anchor="middle" font-family="Mulish" font-size="8.4" font-weight="800" fill="#101210">Branch F · Wrong or unclear device</text>
         <circle cx="473" cy="568" r="2.4" fill="#b8863f"/>
         <text x="482" y="572" font-family="Roboto Mono" font-size="7" fill="#8a6530">unclear after two attempts &#8594; warm handoff</text>
